@@ -1,0 +1,40 @@
+{
+  "title": "How the Grid Keeps the Lights On",
+  "subtitle": "From spinning magnets to your wall socket",
+  "logline": "Electricity is made, stepped up, shipped and balanced every second.",
+  "scenes": [
+    {
+      "id": "spin",
+      "heading": "Spinning magnets",
+      "concept": "Generators turn rotation into alternating current.",
+      "sentences": [
+        "Every power plant ends the same way, with a magnet spinning inside coils of copper wire.",
+        "Each turn pushes electrons back and forth sixty times a second."
+      ],
+      "visual_idea": "A generator cutaway spins up while its output wave grows and a frequency readout climbs to 60 Hz.",
+      "key_terms": ["generator", "60 Hz"]
+    },
+    {
+      "id": "step-up",
+      "heading": "Boost the voltage",
+      "concept": "High voltage means low current, so long lines lose less.",
+      "sentences": [
+        "A transformer next to the plant raises the voltage to 400,000 volts.",
+        "Higher voltage means less current, so the long lines waste far less energy as heat."
+      ],
+      "visual_idea": "Flux circulates in a transformer core with few primary and many secondary turns, then current streams down a cool high-voltage line.",
+      "key_terms": ["transformer", "400 kV"]
+    },
+    {
+      "id": "balance",
+      "heading": "Balance every second",
+      "concept": "Supply must match demand or the frequency drifts.",
+      "sentences": [
+        "When a city switches on its kettles, demand jumps ahead of supply.",
+        "The frequency sags below 60 Hz until plants open their throttles and catch up."
+      ],
+      "visual_idea": "City lights brighten, the supply-demand see-saw tips, and the frequency needle dips to 59.95 Hz before recovering.",
+      "key_terms": ["supply", "demand", "frequency"]
+    }
+  ]
+}

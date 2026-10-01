@@ -1,0 +1,135 @@
+# Shot list for "How a Heat Pump Works". Timing keys: sN = start of narration sentence N in the scene.
+scenes:
+  - id: hook
+    template: title
+    title: How a Heat Pump Works
+    subtitle: Moving heat instead of making it
+    kicker: Theory explainer
+    icon: thermometer
+    hold: 0.4
+
+  - id: idea
+    template: compare
+    heading: Pumping heat uphill
+    cards:
+      - title: On its own
+        from_icon: flame
+        from_color: hot
+        to_icon: snowflake
+        to_color: cold
+        flow_label: "heat flows hot → cold"
+        color: coral
+        items: ["Always runs downhill", "Needs no energy"]
+        at: s1
+      - title: With a heat pump
+        from_icon: snowflake
+        from_color: cold
+        to_icon: house
+        to_color: hot
+        flow_label: "heat pushed cold → warm"
+        color: cyan
+        items: ["Pulls heat from winter air", "Costs a little work"]
+        at: s3
+
+  - id: parts
+    template: diagram
+    heading: Four key parts, one sealed loop
+    nodes:
+      - {id: ref, label: Refrigerant, sub: "boils far below 0 °C", icon: drop, color: cyan, x: 0.5, y: 0.45, px: 0.5, py: 0.42, r: 70, at: s1+0.3}
+      - {id: evap, label: Evaporator, icon: coil, color: cold, x: 0.08, y: 0.4, px: 0.5, py: 0.0, at: s2+2.4}
+      - {id: comp, label: Compressor, icon: compressor, color: violet, x: 0.5, y: 0.0, px: 0.94, py: 0.42, r: 50, at: s2+3.4}
+      - {id: cond, label: Condenser, icon: coil, color: hot, x: 0.92, y: 0.4, px: 0.5, py: 0.9, at: s2+4.4}
+      - {id: valve, label: Expansion valve, icon: valve, color: amber, x: 0.5, y: 0.98, px: 0.06, py: 0.42, r: 50, at: s2+5.6}
+    edges:
+      - {from: evap, to: comp, color: cool, flow: true, bend: -0.12, at: s2+3.6}
+      - {from: comp, to: cond, color: hot, flow: true, bend: -0.12, at: s2+4.6}
+      - {from: cond, to: valve, color: warm, flow: true, bend: -0.12, at: s2+5.8}
+      - {from: valve, to: evap, color: cold, flow: true, bend: -0.12, at: s2+6.2}
+
+  - id: outside
+    template: cycle
+    heading: Absorb and compress
+    loop_at: 0.3
+    segment_colors: [cool, hot, warm, cold]
+    zones:
+      - {label: Outdoors, color: cold}
+      - {label: Indoors, color: hot}
+    nodes:
+      - {label: Evaporator, sub: "absorbs outdoor heat", icon: coil, color: cold, at: 0.5}
+      - {label: Compressor, sub: "raises pressure + temp", icon: compressor, color: violet, at: 0.7}
+      - {label: Condenser, sub: "releases heat indoors", icon: coil, color: hot, at: 0.9}
+      - {label: Expansion valve, sub: "drops the pressure", icon: valve, color: amber, at: 1.1}
+    highlight:
+      - {node: 0, at: s1}
+      - {node: 1, at: s3}
+    heat:
+      - {node: 0, dir: in, label: "heat from outdoor air", color: cold, at: s2}
+
+  - id: inside
+    template: cycle
+    heading: Release and expand
+    loop_at: 0.0
+    segment_colors: [cool, hot, warm, cold]
+    zones:
+      - {label: Outdoors, color: cold}
+      - {label: Indoors, color: hot}
+    nodes:
+      - {label: Evaporator, sub: "absorbs outdoor heat", icon: coil, color: cold, at: 0.2}
+      - {label: Compressor, sub: "raises pressure + temp", icon: compressor, color: violet, at: 0.3}
+      - {label: Condenser, sub: "releases heat indoors", icon: coil, color: hot, at: 0.4}
+      - {label: Expansion valve, sub: "drops the pressure", icon: valve, color: amber, at: 0.5}
+    highlight:
+      - {node: 2, at: s1}
+      - {node: 3, at: s3}
+    heat:
+      - {node: 2, dir: out, label: "heat into the home", color: hot, at: s2}
+
+  - id: cop
+    template: stat
+    heading: Coefficient of performance
+    value: "3"
+    unit: "× the heat"
+    label: Units of heat delivered per unit of electricity
+    at: s1+1.2
+    bars:
+      - {label: "Heat pump (COP ≈ 3)", value: 3, display: "3 units", color: mint, at: s1+2.4}
+      - {label: "Electric heater (COP = 1)", value: 1, display: "1 unit", color: coral, at: s3}
+    note: "Mild day: ~2/3 of the heat comes from outside air"
+    note_at: s4+0.4
+
+  - id: reverse
+    template: compare
+    heading: Run it backwards
+    notes:
+      - {text: "A reversing valve flips the refrigerant flow", at: s1+0.8}
+    cards:
+      - title: Heating mode
+        from_icon: snowflake
+        from_color: cold
+        to_icon: house
+        to_color: hot
+        flow_label: "outdoors → indoors"
+        color: coral
+        items: ["Outdoor coil absorbs heat", "Indoor coil releases it"]
+        at: 0.4
+      - title: Cooling mode
+        from_icon: house
+        from_color: cold
+        to_icon: sun
+        to_color: hot
+        flow_label: "indoors → outdoors"
+        color: cyan
+        items: ["Indoor coil absorbs heat", "Outdoor coil dumps it"]
+        at: s2
+
+  - id: recap
+    template: recap
+    heading: A heat mover, not a heat maker
+    hold: 2.2
+    title: "Boil · Compress · Condense · Expand"
+    end_at: s2+3.2
+    items:
+      - {text: Boil, icon: snowflake, color: cold, at: s2}
+      - {text: Compress, icon: compressor, color: violet, at: s2+0.6}
+      - {text: Condense, icon: flame, color: hot, at: s2+1.2}
+      - {text: Expand, icon: valve, color: amber, at: s2+1.8}

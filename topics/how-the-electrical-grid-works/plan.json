@@ -1,0 +1,2776 @@
+{
+  "provenance": {
+    "writer": "claude:opus",
+    "fallback": false,
+    "source": "Opus plan reviewed for the v3 grid render; pinned so the final render uses exactly this plan",
+    "edits": [
+      "kettle-moment: 'Change exaggerated for illustration' beside the generator-load gauge (50->54% for one kettle is magnified)",
+      "balance-frequency: 'Exaggerated for illustration: one kettle's real dip is far smaller' under the frequency dial; kettle drawn as a kettle icon instead of a 'kW' badge; spinning-mass and storage labels moved above their actors",
+      "heartbeat: 'Nudge exaggerated for illustration' by the kettle; kettle icon instead of a bolt; 'Not a warehouse' moved inside the opening camera view (it sat below the frame); shed-load label above the dial",
+      "control-response: badge 1 moved off the 30 s tick label",
+      "step-down: pole-transformer label on top and the voltage meter parked right of the pole so they don't collide",
+      "spinning-magnet: meter caption 'Cycles per second' (60 Hz is 60 cycles, i.e. 120 reversals, per second); the matching narration line in script.md says 'swinging back and forth 60 times every second'",
+      "balance-frequency and heartbeat: exaggeration notes enlarged and raised off the caption band (video review found them small and cramped); frequency arc nudged up to make room",
+      "kettle-moment: exaggeration note raised from size xs to s, the size the other notes use, and nudged left of the load gauge"
+    ]
+  },
+  "style": {
+    "palette": {
+      "bg": "#0B1220",
+      "surface": "#16213A",
+      "ink": "#E8EEF7",
+      "muted": "#7A8BA8",
+      "accent": "#FFB627",
+      "accent2": "#3FD0FF",
+      "accent3": "#B388FF",
+      "warn": "#FF5D5D",
+      "good": "#4BE08A",
+      "hot": "#FF7A2F",
+      "cold": "#5AA9FF"
+    },
+    "background": "night",
+    "typeface": "geometric",
+    "line": "regular",
+    "corners": "soft",
+    "motion": "measured",
+    "mood": "Night-time control room: dark navy stage, glowing amber energy, cyan instruments, precise and calm"
+  },
+  "poster": {
+    "scene": "balance-frequency",
+    "at": "s4+1.5"
+  },
+  "scenes": [
+    {
+      "id": "kettle-moment",
+      "concept": "The grid has no stockpile of electricity, so every appliance you switch on is served by generation happening at that same moment.",
+      "mechanism": "Kettle load meter jumps to 1,500 W; at the same instant a pulse races down the line and the distant plant's load gauge ticks up, while an empty storage outline on the wire stays empty.",
+      "visual_cue": "House on the left, gas plant far right, one long powerline between them, an empty dashed tank under the wire.",
+      "composition": "Wide split: load left, generation right, linked by a single sagging line across the frame.",
+      "transition": "fade",
+      "portrait_focus": [
+        560,
+        120,
+        480,
+        640
+      ],
+      "actors": [
+        {
+          "id": "home",
+          "kind": "house",
+          "at": [
+            330,
+            460
+          ],
+          "params": {
+            "style": "house",
+            "lights": 0.3,
+            "load": 0,
+            "size": 260
+          }
+        },
+        {
+          "id": "kw",
+          "kind": "meter",
+          "at": [
+            330,
+            200
+          ],
+          "params": {
+            "value": 0,
+            "unit": "W",
+            "text": "Kettle draw",
+            "decimals": 0,
+            "color": "#FFB627",
+            "size": "l"
+          }
+        },
+        {
+          "id": "plant",
+          "kind": "plant",
+          "at": [
+            1270,
+            450
+          ],
+          "params": {
+            "type": "gas",
+            "output": 0.5,
+            "size": 280,
+            "text": "Gas plant"
+          }
+        },
+        {
+          "id": "pg",
+          "kind": "gauge",
+          "at": [
+            1270,
+            190
+          ],
+          "params": {
+            "min": 0,
+            "max": 100,
+            "value": 50,
+            "unit": "%",
+            "text": "Generator load",
+            "decimals": 0,
+            "radius": 90,
+            "style": "arc",
+            "zones": [
+              {
+                "from": 0,
+                "to": 80,
+                "color": "#4BE08A"
+              },
+              {
+                "from": 80,
+                "to": 100,
+                "color": "#FF5D5D"
+              }
+            ]
+          }
+        },
+        {
+          "id": "line",
+          "kind": "powerline",
+          "params": {
+            "from": "plant.left",
+            "to": "home.right",
+            "voltage": "hv",
+            "supports": 3,
+            "sag": 30,
+            "flow": 0.3,
+            "heat": 0
+          }
+        },
+        {
+          "id": "dist",
+          "kind": "dimension",
+          "params": {
+            "from": [
+              470,
+              640
+            ],
+            "to": [
+              1130,
+              640
+            ],
+            "text": "hundreds of miles",
+            "offset": 40,
+            "color": "#7A8BA8"
+          }
+        },
+        {
+          "id": "tank",
+          "kind": "shape",
+          "at": [
+            800,
+            520
+          ],
+          "visible": false,
+          "params": {
+            "shape": "rounded",
+            "w": 170,
+            "h": 90,
+            "stroke": "#7A8BA8",
+            "stroke_width": 3,
+            "dashed": true
+          }
+        },
+        {
+          "id": "tank_lbl",
+          "kind": "label",
+          "visible": false,
+          "params": {
+            "text": "Stored here: 0 W",
+            "target": "tank",
+            "side": "bottom",
+            "leader": false,
+            "color": "#7A8BA8"
+          }
+        },
+        {
+          "id": "q",
+          "kind": "text",
+          "at": [
+            800,
+            110
+          ],
+          "visible": false,
+          "params": {
+            "text": "How does it keep up?",
+            "size": "l",
+            "weight": "bold",
+            "align": "center",
+            "color": "#E8EEF7"
+          }
+        },
+        {
+          "id": "exag1",
+          "kind": "text",
+          "at": [
+            1150,
+            186
+          ],
+          "visible": false,
+          "params": {
+            "text": "Change exaggerated for illustration",
+            "size": "s",
+            "weight": "medium",
+            "align": "right",
+            "color": "warn"
+          }
+        }
+      ],
+      "beats": [
+        {
+          "at": "s1",
+          "do": "set",
+          "target": "home",
+          "param": "load",
+          "to": 1,
+          "dur": 0.6,
+          "ease": "out",
+          "why": "kettle switches on"
+        },
+        {
+          "at": "s1+0.2",
+          "do": "set",
+          "target": "kw",
+          "param": "value",
+          "to": 1500,
+          "dur": 0.9,
+          "ease": "out"
+        },
+        {
+          "at": "s1+0.2",
+          "do": "pulse",
+          "target": "home"
+        },
+        {
+          "at": "s2",
+          "do": "trace",
+          "target": "line",
+          "color": "#FFB627",
+          "dur": 0.6,
+          "why": "generation responds at the same moment"
+        },
+        {
+          "at": "s2+0.2",
+          "do": "set",
+          "target": "pg",
+          "param": "value",
+          "to": 54,
+          "dur": 0.8,
+          "ease": "spring"
+        },
+        {
+          "at": "s2+0.2",
+          "do": "set",
+          "target": "plant",
+          "param": "output",
+          "to": 0.6,
+          "dur": 0.8
+        },
+        {
+          "at": "s2+0.2",
+          "do": "set",
+          "target": "line",
+          "param": "flow",
+          "to": 0.55,
+          "dur": 0.8
+        },
+        {
+          "at": "s3",
+          "do": "enter",
+          "target": "tank",
+          "anim": "draw",
+          "dur": 0.6
+        },
+        {
+          "at": "s3+0.4",
+          "do": "enter",
+          "target": "tank_lbl",
+          "anim": "fade"
+        },
+        {
+          "at": "s3+0.8",
+          "do": "pulse",
+          "target": "tank",
+          "why": "nothing was waiting in the wire"
+        },
+        {
+          "at": "s4",
+          "do": "enter",
+          "target": "q",
+          "anim": "fade"
+        },
+        {
+          "at": "s4+0.4",
+          "do": "pulse",
+          "target": "pg"
+        },
+        {
+          "at": "s2+0.3",
+          "do": "enter",
+          "target": "exag1",
+          "anim": "fade",
+          "why": "one kettle barely registers at a real plant"
+        }
+      ]
+    },
+    {
+      "id": "spinning-magnet",
+      "concept": "Generators make alternating current by spinning a magnet past coils of wire, and drawing current pushes back on that magnet, so delivering more power takes more push.",
+      "mechanism": "Steam drives a turbine that spins a magnet rotor inside stator coils; a sine wave grows in step and the Hz meter counts to 60. When the kettle loads it, counter-torque arrows appear and the steam jet must widen to hold 3,600 rpm.",
+      "visual_cue": "Left-to-right drive train: steam jet, turbine, generator cutaway, then the live voltage wave.",
+      "composition": "Horizontal machine cutaway left; live waveform and readouts right.",
+      "transition": "cut",
+      "portrait_focus": [
+        380,
+        120,
+        540,
+        640
+      ],
+      "actors": [
+        {
+          "id": "steam",
+          "kind": "path",
+          "at": [
+            85,
+            400
+          ],
+          "params": {
+            "points": [
+              [
+                20,
+                400
+              ],
+              [
+                140,
+                400
+              ]
+            ],
+            "color": "#7A8BA8",
+            "width": 20,
+            "arrow": "end"
+          }
+        },
+        {
+          "id": "steam_flow",
+          "kind": "flow",
+          "visible": false,
+          "params": {
+            "along": "steam",
+            "particles": 18,
+            "speed": 300,
+            "size": 8,
+            "color": "#CFE3FF",
+            "style": "dashes",
+            "direction": "forward"
+          }
+        },
+        {
+          "id": "turb",
+          "kind": "rotor",
+          "at": [
+            260,
+            400
+          ],
+          "params": {
+            "radius": 115,
+            "style": "turbine",
+            "rpm": 0,
+            "color": "#5AA9FF"
+          }
+        },
+        {
+          "id": "turb_lbl",
+          "kind": "label",
+          "params": {
+            "text": "Turbine",
+            "target": "turb",
+            "side": "top",
+            "leader": false
+          }
+        },
+        {
+          "id": "shaft",
+          "kind": "path",
+          "params": {
+            "points": [
+              [
+                375,
+                400
+              ],
+              [
+                450,
+                400
+              ]
+            ],
+            "color": "#7A8BA8",
+            "width": 14
+          }
+        },
+        {
+          "id": "gen",
+          "kind": "generator",
+          "at": [
+            640,
+            400
+          ],
+          "params": {
+            "rpm": 0,
+            "poles": 2,
+            "size": 380,
+            "show_wave": false,
+            "text": "Generator"
+          }
+        },
+        {
+          "id": "rpm",
+          "kind": "meter",
+          "at": [
+            640,
+            150
+          ],
+          "params": {
+            "value": 0,
+            "unit": "rpm",
+            "text": "Rotor speed",
+            "decimals": 0,
+            "color": "#3FD0FF",
+            "size": "m"
+          }
+        },
+        {
+          "id": "out",
+          "kind": "arrow",
+          "params": {
+            "from": "gen.out",
+            "to": [
+              905,
+              320
+            ],
+            "color": "#FFB627",
+            "width": 4,
+            "dashed": true
+          }
+        },
+        {
+          "id": "wave",
+          "kind": "wave",
+          "at": [
+            1190,
+            320
+          ],
+          "params": {
+            "w": 540,
+            "h": 230,
+            "waveform": "sine",
+            "cycles": 3,
+            "amplitude": 0,
+            "speed": 2,
+            "color": "#FFB627",
+            "axis": true,
+            "text": "Voltage"
+          }
+        },
+        {
+          "id": "hz",
+          "kind": "meter",
+          "at": [
+            1190,
+            540
+          ],
+          "params": {
+            "value": 0,
+            "unit": "Hz",
+            "text": "Cycles per second",
+            "decimals": 0,
+            "color": "#FFB627",
+            "size": "l"
+          }
+        },
+        {
+          "id": "kettle",
+          "kind": "icon",
+          "at": [
+            1190,
+            680
+          ],
+          "visible": false,
+          "params": {
+            "name": "bolt",
+            "size": 70,
+            "color": "#FF7A2F"
+          }
+        },
+        {
+          "id": "kettle_lbl",
+          "kind": "label",
+          "visible": false,
+          "params": {
+            "text": "Kettle draws current",
+            "target": "kettle",
+            "side": "right",
+            "leader": false,
+            "color": "#FF7A2F"
+          }
+        },
+        {
+          "id": "back1",
+          "kind": "arrow",
+          "visible": false,
+          "params": {
+            "from": [
+              850,
+              250
+            ],
+            "to": [
+              850,
+              550
+            ],
+            "curve": 0.5,
+            "color": "#FF5D5D",
+            "width": 8
+          }
+        },
+        {
+          "id": "back2",
+          "kind": "arrow",
+          "visible": false,
+          "params": {
+            "from": [
+              430,
+              550
+            ],
+            "to": [
+              430,
+              250
+            ],
+            "curve": 0.5,
+            "color": "#FF5D5D",
+            "width": 8,
+            "text": "push-back"
+          }
+        }
+      ],
+      "beats": [
+        {
+          "at": "s1",
+          "do": "pulse",
+          "target": "gen"
+        },
+        {
+          "at": "s1+0.3",
+          "do": "set",
+          "target": "gen",
+          "param": "rpm",
+          "to": 300,
+          "dur": 2,
+          "ease": "smooth",
+          "why": "magnet spinning inside coils"
+        },
+        {
+          "at": "s2",
+          "do": "enter",
+          "target": "steam_flow",
+          "anim": "fade"
+        },
+        {
+          "at": "s2",
+          "do": "set",
+          "target": "turb",
+          "param": "rpm",
+          "to": 300,
+          "dur": 1.5,
+          "ease": "smooth"
+        },
+        {
+          "at": "s2+0.3",
+          "do": "set",
+          "target": "rpm",
+          "param": "value",
+          "to": 3600,
+          "dur": 1.5,
+          "ease": "out"
+        },
+        {
+          "at": "s3",
+          "do": "trace",
+          "target": "out",
+          "color": "#FFB627",
+          "dur": 0.6
+        },
+        {
+          "at": "s3+0.3",
+          "do": "set",
+          "target": "wave",
+          "param": "amplitude",
+          "to": 1,
+          "dur": 1.5,
+          "ease": "smooth",
+          "why": "voltage rises, falls, reverses"
+        },
+        {
+          "at": "s4",
+          "do": "set",
+          "target": "hz",
+          "param": "value",
+          "to": 60,
+          "dur": 1.2,
+          "ease": "out"
+        },
+        {
+          "at": "s4+1.2",
+          "do": "pulse",
+          "target": "hz"
+        },
+        {
+          "at": "s5",
+          "do": "enter",
+          "target": [
+            "kettle",
+            "kettle_lbl"
+          ],
+          "anim": "pop"
+        },
+        {
+          "at": "s5+0.8",
+          "do": "enter",
+          "target": [
+            "back1",
+            "back2"
+          ],
+          "anim": "draw",
+          "dur": 0.6,
+          "why": "current pushes back on the magnet"
+        },
+        {
+          "at": "s5+1.6",
+          "do": "set",
+          "target": "steam",
+          "param": "width",
+          "to": 38,
+          "dur": 1,
+          "ease": "out"
+        },
+        {
+          "at": "s5+1.6",
+          "do": "set",
+          "target": "steam_flow",
+          "param": "speed",
+          "to": 750,
+          "dur": 1
+        },
+        {
+          "at": "s5+1.6",
+          "do": "set",
+          "target": "steam_flow",
+          "param": "size",
+          "to": 16,
+          "dur": 1
+        },
+        {
+          "at": "s5+2.4",
+          "do": "pulse",
+          "target": "rpm",
+          "why": "speed held constant with more push"
+        }
+      ]
+    },
+    {
+      "id": "energy-not-electrons",
+      "concept": "In AC wiring, electrons only oscillate in place while energy races down the line as an electromagnetic wave.",
+      "mechanism": "Camera zooms into the wire where electron dots slosh back and forth (alternate flow) and one tagged electron shuttles in a tiny bracket; then the camera pulls out as a field wavefront traces the whole wire from plant to house.",
+      "visual_cue": "One long copper wire from plant to house; close-up of jiggling electrons, then a bright wave sweeping end to end.",
+      "composition": "Single horizontal wire spanning the frame; camera dives in, then pulls back.",
+      "transition": "fade",
+      "portrait_focus": [
+        560,
+        250,
+        480,
+        420
+      ],
+      "actors": [
+        {
+          "id": "plant",
+          "kind": "plant",
+          "at": [
+            130,
+            430
+          ],
+          "params": {
+            "type": "coal",
+            "output": 0.8,
+            "size": 190
+          }
+        },
+        {
+          "id": "home",
+          "kind": "house",
+          "at": [
+            1470,
+            450
+          ],
+          "params": {
+            "style": "house",
+            "lights": 0.3,
+            "size": 170
+          }
+        },
+        {
+          "id": "wire",
+          "kind": "path",
+          "params": {
+            "points": [
+              [
+                230,
+                450
+              ],
+              [
+                1380,
+                450
+              ]
+            ],
+            "color": "#C98A3A",
+            "width": 12
+          }
+        },
+        {
+          "id": "elec",
+          "kind": "flow",
+          "params": {
+            "along": "wire",
+            "particles": 46,
+            "speed": 40,
+            "size": 9,
+            "color": "#3FD0FF",
+            "style": "dots",
+            "direction": "alternate"
+          }
+        },
+        {
+          "id": "tag",
+          "kind": "shape",
+          "at": [
+            800,
+            450
+          ],
+          "z": 2,
+          "params": {
+            "shape": "circle",
+            "r": 11,
+            "fill": "#FF5D5D"
+          }
+        },
+        {
+          "id": "zone",
+          "kind": "dimension",
+          "visible": false,
+          "params": {
+            "from": [
+              770,
+              450
+            ],
+            "to": [
+              830,
+              450
+            ],
+            "text": "stays right here",
+            "offset": -55,
+            "color": "#FF5D5D"
+          }
+        },
+        {
+          "id": "drift",
+          "kind": "meter",
+          "at": [
+            800,
+            560
+          ],
+          "visible": false,
+          "params": {
+            "value": 0.1,
+            "unit": "mm/s",
+            "text": "Electron drift",
+            "decimals": 1,
+            "color": "#3FD0FF",
+            "size": "s"
+          }
+        },
+        {
+          "id": "fieldw",
+          "kind": "field",
+          "visible": false,
+          "params": {
+            "around": "wire",
+            "radius": 110,
+            "lines": 10,
+            "style": "electric",
+            "strength": 0,
+            "color": "#FFB627"
+          }
+        },
+        {
+          "id": "energy_lbl",
+          "kind": "label",
+          "visible": false,
+          "params": {
+            "text": "Energy: near light speed",
+            "target": [
+              800,
+              330
+            ],
+            "side": "top",
+            "leader": false,
+            "color": "#FFB627"
+          }
+        }
+      ],
+      "beats": [
+        {
+          "at": "s1",
+          "do": "pulse",
+          "target": "plant"
+        },
+        {
+          "at": "s1+1",
+          "do": "pulse",
+          "target": "home",
+          "why": "the electrons never make this trip"
+        },
+        {
+          "at": "s2",
+          "do": "camera",
+          "region": [
+            560,
+            330,
+            480,
+            270
+          ],
+          "dur": 1.4,
+          "ease": "smooth"
+        },
+        {
+          "at": "s2+0.8",
+          "do": "enter",
+          "target": "zone",
+          "anim": "draw"
+        },
+        {
+          "at": "s2+0.8",
+          "do": "move",
+          "target": "tag",
+          "to": [
+            822,
+            450
+          ],
+          "dur": 0.5,
+          "ease": "smooth"
+        },
+        {
+          "at": "s2+1.3",
+          "do": "move",
+          "target": "tag",
+          "to": [
+            778,
+            450
+          ],
+          "dur": 0.5,
+          "ease": "smooth"
+        },
+        {
+          "at": "s2+1.8",
+          "do": "move",
+          "target": "tag",
+          "to": [
+            822,
+            450
+          ],
+          "dur": 0.5,
+          "ease": "smooth"
+        },
+        {
+          "at": "s2+2.3",
+          "do": "move",
+          "target": "tag",
+          "to": [
+            800,
+            450
+          ],
+          "dur": 0.4,
+          "ease": "smooth"
+        },
+        {
+          "at": "s2+1",
+          "do": "enter",
+          "target": "drift",
+          "anim": "fade"
+        },
+        {
+          "at": "s3",
+          "do": "camera",
+          "region": [
+            0,
+            0,
+            1600,
+            900
+          ],
+          "dur": 1.2,
+          "ease": "smooth"
+        },
+        {
+          "at": "s3+0.8",
+          "do": "enter",
+          "target": "fieldw",
+          "anim": "fade"
+        },
+        {
+          "at": "s3+0.8",
+          "do": "set",
+          "target": "fieldw",
+          "param": "strength",
+          "to": 1,
+          "dur": 0.8
+        },
+        {
+          "at": "s3+1",
+          "do": "trace",
+          "target": "wire",
+          "color": "#FFB627",
+          "dur": 0.5,
+          "repeat": 3,
+          "why": "energy sweeps the full line instantly"
+        },
+        {
+          "at": "s3+1.4",
+          "do": "set",
+          "target": "home",
+          "param": "lights",
+          "to": 1,
+          "dur": 0.4
+        },
+        {
+          "at": "s3+1.6",
+          "do": "enter",
+          "target": "energy_lbl",
+          "anim": "fade"
+        }
+      ]
+    },
+    {
+      "id": "step-up",
+      "concept": "Raising the voltage lets the same power flow with less current, and because heat loss grows with the square of the current, losses fall sharply.",
+      "mechanism": "Line glows hot under a thick stream of current; the step-up transformer raises the voltage meter, the current meter and stream shrink, the glow fades, and the heat-loss bar drops while the V×I power bar never changes. Doubling voltage again halves current and cuts loss to a quarter.",
+      "visual_cue": "Plant and transformer at left, long glowing line across top; voltage and current readouts and a power vs heat-loss bar chart below.",
+      "composition": "Top band: plant, transformer, long line. Bottom band: instruments.",
+      "transition": "slide_left",
+      "portrait_focus": [
+        300,
+        200,
+        620,
+        560
+      ],
+      "actors": [
+        {
+          "id": "plant",
+          "kind": "plant",
+          "at": [
+            120,
+            300
+          ],
+          "params": {
+            "type": "gas",
+            "output": 0.8,
+            "size": 180
+          }
+        },
+        {
+          "id": "xf",
+          "kind": "transformer",
+          "at": [
+            350,
+            310
+          ],
+          "params": {
+            "style": "substation",
+            "primary_turns": 4,
+            "secondary_turns": 30,
+            "v_in": "20 kV",
+            "v_out": "345 kV",
+            "flux": 0,
+            "size": 170
+          }
+        },
+        {
+          "id": "line",
+          "kind": "powerline",
+          "params": {
+            "from": "xf.out",
+            "to": [
+              1540,
+              300
+            ],
+            "voltage": "hv",
+            "supports": 4,
+            "sag": 40,
+            "flow": 0.8,
+            "heat": 0.3
+          }
+        },
+        {
+          "id": "amps_flow",
+          "kind": "flow",
+          "params": {
+            "along": "line",
+            "particles": 90,
+            "speed": 300,
+            "size": 16,
+            "color": "#FF7A2F",
+            "style": "arrows",
+            "direction": "forward"
+          }
+        },
+        {
+          "id": "hot_lbl",
+          "kind": "label",
+          "params": {
+            "text": "Wire heats up",
+            "target": "line.mid",
+            "side": "top",
+            "leader": true,
+            "color": "#FF7A2F"
+          }
+        },
+        {
+          "id": "volts",
+          "kind": "meter",
+          "at": [
+            300,
+            560
+          ],
+          "params": {
+            "value": 20,
+            "unit": "kV",
+            "text": "Voltage",
+            "decimals": 0,
+            "color": "#3FD0FF",
+            "size": "l"
+          }
+        },
+        {
+          "id": "amps",
+          "kind": "meter",
+          "at": [
+            640,
+            560
+          ],
+          "params": {
+            "value": 29000,
+            "unit": "A",
+            "text": "Current",
+            "decimals": 0,
+            "color": "#FF7A2F",
+            "size": "l"
+          }
+        },
+        {
+          "id": "bars",
+          "kind": "bars",
+          "at": [
+            1180,
+            590
+          ],
+          "params": {
+            "labels": [
+              "Power V × I",
+              "Heat loss I²R"
+            ],
+            "values": [
+              100,
+              100
+            ],
+            "max": 100,
+            "unit": "",
+            "w": 540,
+            "h": 230,
+            "orientation": "horizontal",
+            "colors": [
+              "#FFB627",
+              "#FF7A2F"
+            ]
+          }
+        },
+        {
+          "id": "law",
+          "kind": "text",
+          "at": [
+            1180,
+            440
+          ],
+          "visible": false,
+          "params": {
+            "text": "Loss grows with current²",
+            "size": "m",
+            "weight": "medium",
+            "align": "center",
+            "color": "#FF7A2F"
+          }
+        },
+        {
+          "id": "dbl",
+          "kind": "text",
+          "at": [
+            1180,
+            440
+          ],
+          "visible": false,
+          "params": {
+            "text": "2× voltage → ¼ loss",
+            "size": "m",
+            "weight": "bold",
+            "align": "center",
+            "color": "#4BE08A"
+          }
+        }
+      ],
+      "beats": [
+        {
+          "at": "s1",
+          "do": "set",
+          "target": "line",
+          "param": "heat",
+          "to": 1,
+          "dur": 1.5,
+          "ease": "smooth",
+          "why": "current heats the wire"
+        },
+        {
+          "at": "s1+0.5",
+          "do": "pulse",
+          "target": "hot_lbl"
+        },
+        {
+          "at": "s2",
+          "do": "enter",
+          "target": "law",
+          "anim": "fade"
+        },
+        {
+          "at": "s2+0.4",
+          "do": "pulse",
+          "target": "bars"
+        },
+        {
+          "at": "s3",
+          "do": "pulse",
+          "target": "xf"
+        },
+        {
+          "at": "s3",
+          "do": "set",
+          "target": "xf",
+          "param": "flux",
+          "to": 1,
+          "dur": 1
+        },
+        {
+          "at": "s3+0.3",
+          "do": "set",
+          "target": "volts",
+          "param": "value",
+          "to": 345,
+          "dur": 1.6,
+          "ease": "out",
+          "why": "transformer steps voltage up"
+        },
+        {
+          "at": "s4",
+          "do": "set",
+          "target": "amps",
+          "param": "value",
+          "to": 1673,
+          "dur": 1.6,
+          "ease": "out"
+        },
+        {
+          "at": "s4",
+          "do": "set",
+          "target": "amps_flow",
+          "param": "size",
+          "to": 7,
+          "dur": 1.6
+        },
+        {
+          "at": "s4",
+          "do": "set",
+          "target": "amps_flow",
+          "param": "particles",
+          "to": 35,
+          "dur": 1.6
+        },
+        {
+          "at": "s4+0.4",
+          "do": "set",
+          "target": "line",
+          "param": "heat",
+          "to": 0.35,
+          "dur": 1.6
+        },
+        {
+          "at": "s4+0.4",
+          "do": "set",
+          "target": "bars",
+          "param": "values",
+          "to": [
+            100,
+            40
+          ],
+          "dur": 1.6,
+          "ease": "smooth",
+          "why": "power unchanged, loss collapses"
+        },
+        {
+          "at": "s4+0.4",
+          "do": "exit",
+          "target": "law",
+          "anim": "fade"
+        },
+        {
+          "at": "s5",
+          "do": "enter",
+          "target": "dbl",
+          "anim": "pop"
+        },
+        {
+          "at": "s5+0.3",
+          "do": "set",
+          "target": "volts",
+          "param": "value",
+          "to": 690,
+          "dur": 1.2,
+          "ease": "out"
+        },
+        {
+          "at": "s5+0.3",
+          "do": "set",
+          "target": "amps",
+          "param": "value",
+          "to": 837,
+          "dur": 1.2,
+          "ease": "out"
+        },
+        {
+          "at": "s5+0.3",
+          "do": "set",
+          "target": "amps_flow",
+          "param": "size",
+          "to": 3.5,
+          "dur": 1.2
+        },
+        {
+          "at": "s5+0.3",
+          "do": "set",
+          "target": "amps_flow",
+          "param": "particles",
+          "to": 18,
+          "dur": 1.2
+        },
+        {
+          "at": "s5+0.8",
+          "do": "set",
+          "target": "bars",
+          "param": "values",
+          "to": [
+            100,
+            10
+          ],
+          "dur": 1.2,
+          "ease": "smooth"
+        },
+        {
+          "at": "s5+0.8",
+          "do": "set",
+          "target": "line",
+          "param": "heat",
+          "to": 0.1,
+          "dur": 1.2
+        }
+      ],
+      "hold": 1
+    },
+    {
+      "id": "step-down",
+      "concept": "Substations and neighborhood transformers lower the voltage in stages until it is safe for the outlets in your home.",
+      "mechanism": "Camera follows the energy from a tall tower to a substation, along a feeder to a pole transformer, and into a house; a travelling voltage meter rolls down from 345,000 V to 12,470 V to 120 V as the lines get lower.",
+      "visual_cue": "A descending landscape: tall tower, fenced substation, short pole, house, each wire lower than the last.",
+      "composition": "Panoramic descending journey, left to right, camera panning stop to stop.",
+      "transition": "fade",
+      "camera": [
+        0,
+        100,
+        720,
+        405
+      ],
+      "portrait_focus": [
+        500,
+        250,
+        600,
+        500
+      ],
+      "actors": [
+        {
+          "id": "tow",
+          "kind": "tower",
+          "at": [
+            220,
+            420
+          ],
+          "params": {
+            "height": 460,
+            "circuits": 2
+          }
+        },
+        {
+          "id": "l1",
+          "kind": "powerline",
+          "params": {
+            "from": [
+              0,
+              240
+            ],
+            "to": "tow.arm_left",
+            "voltage": "hv",
+            "sag": 30,
+            "flow": 0.6
+          }
+        },
+        {
+          "id": "l2",
+          "kind": "powerline",
+          "params": {
+            "from": "tow.arm_right",
+            "to": "sub.in",
+            "voltage": "hv",
+            "sag": 40,
+            "flow": 0.6
+          }
+        },
+        {
+          "id": "sub",
+          "kind": "substation",
+          "at": [
+            640,
+            560
+          ],
+          "params": {
+            "size": 280,
+            "breakers": 3,
+            "state": "normal",
+            "text": "Substation"
+          }
+        },
+        {
+          "id": "l3",
+          "kind": "powerline",
+          "params": {
+            "from": "sub.out",
+            "to": "pl.top_wire",
+            "voltage": "mv",
+            "sag": 25,
+            "flow": 0.6,
+            "text": "Feeder"
+          }
+        },
+        {
+          "id": "pl",
+          "kind": "pole",
+          "at": [
+            1100,
+            520
+          ],
+          "params": {
+            "height": 300,
+            "transformer": true
+          }
+        },
+        {
+          "id": "l4",
+          "kind": "powerline",
+          "params": {
+            "from": "pl.drop",
+            "to": "hs.in",
+            "voltage": "lv",
+            "sag": 15,
+            "flow": 0.6
+          }
+        },
+        {
+          "id": "hs",
+          "kind": "house",
+          "at": [
+            1430,
+            600
+          ],
+          "params": {
+            "style": "house",
+            "lights": 0.2,
+            "size": 200
+          }
+        },
+        {
+          "id": "pl_lbl",
+          "kind": "label",
+          "params": {
+            "text": "Pole transformer",
+            "target": "pl.top",
+            "side": "top",
+            "leader": true
+          }
+        },
+        {
+          "id": "vm",
+          "kind": "meter",
+          "at": [
+            520,
+            170
+          ],
+          "params": {
+            "value": 345000,
+            "unit": "V",
+            "text": "Line voltage",
+            "decimals": 0,
+            "color": "#3FD0FF",
+            "size": "l"
+          }
+        }
+      ],
+      "beats": [
+        {
+          "at": "start+0.3",
+          "do": "trace",
+          "target": "l1",
+          "color": "#FFB627",
+          "dur": 0.8
+        },
+        {
+          "at": "s1",
+          "do": "camera",
+          "region": [
+            300,
+            260,
+            720,
+            405
+          ],
+          "dur": 2,
+          "ease": "smooth",
+          "why": "follow the energy to the substation"
+        },
+        {
+          "at": "s1",
+          "do": "move",
+          "target": "vm",
+          "to": [
+            880,
+            320
+          ],
+          "dur": 2,
+          "ease": "smooth"
+        },
+        {
+          "at": "s1+0.3",
+          "do": "trace",
+          "target": "l2",
+          "color": "#FFB627",
+          "dur": 1.2
+        },
+        {
+          "at": "s1+1.5",
+          "do": "set",
+          "target": "sub",
+          "param": "state",
+          "to": "highlight"
+        },
+        {
+          "at": "s1+1.6",
+          "do": "set",
+          "target": "vm",
+          "param": "value",
+          "to": 12470,
+          "dur": 1.6,
+          "ease": "out"
+        },
+        {
+          "at": "s2",
+          "do": "camera",
+          "region": [
+            820,
+            280,
+            720,
+            405
+          ],
+          "dur": 2.4,
+          "ease": "smooth"
+        },
+        {
+          "at": "s2",
+          "do": "move",
+          "target": "vm",
+          "to": [
+            1400,
+            345
+          ],
+          "dur": 2.4,
+          "ease": "smooth"
+        },
+        {
+          "at": "s2+0.3",
+          "do": "trace",
+          "target": "l3",
+          "color": "#FFB627",
+          "dur": 1.4
+        },
+        {
+          "at": "s2+2.2",
+          "do": "pulse",
+          "target": "pl"
+        },
+        {
+          "at": "s2+2.4",
+          "do": "trace",
+          "target": "l4",
+          "color": "#FFB627",
+          "dur": 0.6
+        },
+        {
+          "at": "s2+2.6",
+          "do": "set",
+          "target": "vm",
+          "param": "value",
+          "to": 120,
+          "dur": 1.4,
+          "ease": "out",
+          "why": "final step to outlet voltage"
+        },
+        {
+          "at": "s2+3",
+          "do": "set",
+          "target": "hs",
+          "param": "lights",
+          "to": 1,
+          "dur": 0.6
+        },
+        {
+          "at": "e2",
+          "do": "camera",
+          "region": [
+            0,
+            0,
+            1600,
+            900
+          ],
+          "dur": 1.4,
+          "ease": "smooth"
+        }
+      ],
+      "hold": 1.5
+    },
+    {
+      "id": "balance-frequency",
+      "concept": "Because the grid stores almost nothing, a sudden new demand is first paid for by the spinning mass of every generator, and they all slow together, which lowers the frequency.",
+      "mechanism": "A near-empty battery shows how little storage exists; generation and demand pans stay matched; a kettle weight drops on demand, an arrow shows energy drawn from linked flywheels, every flywheel slows together and the frequency gauge sags from 60.00 to 59.98 Hz.",
+      "visual_cue": "Row of linked generator flywheels above a generation-vs-demand balance, frequency gauge under its pivot.",
+      "composition": "Centered stack: flywheel row on top, balance in middle, frequency dial beneath; tiny storage battery at far left.",
+      "transition": "cut",
+      "portrait_focus": [
+        440,
+        90,
+        720,
+        680
+      ],
+      "actors": [
+        {
+          "id": "shaft",
+          "kind": "path",
+          "z": -1,
+          "params": {
+            "points": [
+              [
+                350,
+                150
+              ],
+              [
+                1250,
+                150
+              ]
+            ],
+            "color": "#7A8BA8",
+            "width": 6
+          }
+        },
+        {
+          "id": "f1",
+          "kind": "rotor",
+          "at": [
+            400,
+            150
+          ],
+          "params": {
+            "radius": 50,
+            "style": "wheel",
+            "rpm": 240,
+            "color": "#3FD0FF"
+          }
+        },
+        {
+          "id": "f2",
+          "kind": "rotor",
+          "at": [
+            600,
+            150
+          ],
+          "params": {
+            "radius": 50,
+            "style": "wheel",
+            "rpm": 240,
+            "color": "#3FD0FF"
+          }
+        },
+        {
+          "id": "f3",
+          "kind": "rotor",
+          "at": [
+            800,
+            150
+          ],
+          "params": {
+            "radius": 50,
+            "style": "wheel",
+            "rpm": 240,
+            "color": "#3FD0FF"
+          }
+        },
+        {
+          "id": "f4",
+          "kind": "rotor",
+          "at": [
+            1000,
+            150
+          ],
+          "params": {
+            "radius": 50,
+            "style": "wheel",
+            "rpm": 240,
+            "color": "#3FD0FF"
+          }
+        },
+        {
+          "id": "f5",
+          "kind": "rotor",
+          "at": [
+            1200,
+            150
+          ],
+          "params": {
+            "radius": 50,
+            "style": "wheel",
+            "rpm": 240,
+            "color": "#3FD0FF"
+          }
+        },
+        {
+          "id": "fly_lbl",
+          "kind": "label",
+          "params": {
+            "text": "Generators' spinning mass",
+            "target": "f5",
+            "side": "top",
+            "leader": false,
+            "color": "#3FD0FF"
+          }
+        },
+        {
+          "id": "bal",
+          "kind": "balance",
+          "at": [
+            800,
+            420
+          ],
+          "params": {
+            "left_text": "Generation",
+            "right_text": "Demand",
+            "left": 100,
+            "right": 100,
+            "width": 760,
+            "color": "#E8EEF7"
+          }
+        },
+        {
+          "id": "fq",
+          "kind": "gauge",
+          "at": [
+            800,
+            645
+          ],
+          "params": {
+            "min": 59.9,
+            "max": 60.1,
+            "value": 60,
+            "unit": "Hz",
+            "decimals": 2,
+            "radius": 95,
+            "style": "arc",
+            "zones": [
+              {
+                "from": 59.9,
+                "to": 59.95,
+                "color": "#FF5D5D"
+              },
+              {
+                "from": 59.95,
+                "to": 60.05,
+                "color": "#4BE08A"
+              },
+              {
+                "from": 60.05,
+                "to": 60.1,
+                "color": "#FF5D5D"
+              }
+            ]
+          }
+        },
+        {
+          "id": "store",
+          "kind": "battery",
+          "at": [
+            140,
+            460
+          ],
+          "visible": false,
+          "params": {
+            "charge": 0.03,
+            "flow": 0,
+            "size": 120
+          }
+        },
+        {
+          "id": "store_lbl",
+          "kind": "label",
+          "visible": false,
+          "params": {
+            "text": "Grid storage: almost none",
+            "target": "store",
+            "side": "top",
+            "leader": false,
+            "color": "#7A8BA8"
+          }
+        },
+        {
+          "id": "kettle",
+          "kind": "icon",
+          "at": [
+            1140,
+            250
+          ],
+          "visible": false,
+          "params": {
+            "name": "kettle",
+            "size": 96,
+            "color": "hot"
+          }
+        },
+        {
+          "id": "kettle_lbl",
+          "kind": "label",
+          "visible": false,
+          "params": {
+            "text": "Kettle +1,500 W",
+            "target": "kettle",
+            "side": "right",
+            "leader": false,
+            "color": "#FF7A2F"
+          }
+        },
+        {
+          "id": "draw",
+          "kind": "arrow",
+          "visible": false,
+          "params": {
+            "from": "f2",
+            "to": [
+              470,
+              360
+            ],
+            "curve": -0.3,
+            "color": "#FFB627",
+            "width": 5,
+            "dashed": true,
+            "text": "inertia pays first"
+          }
+        },
+        {
+          "id": "exag",
+          "kind": "text",
+          "at": [
+            800,
+            700
+          ],
+          "visible": false,
+          "params": {
+            "text": "Exaggerated for illustration: the real dip is tiny",
+            "size": "s",
+            "weight": "medium",
+            "align": "center",
+            "color": "warn"
+          }
+        }
+      ],
+      "beats": [
+        {
+          "at": "s1",
+          "do": "enter",
+          "target": [
+            "store",
+            "store_lbl"
+          ],
+          "anim": "fade"
+        },
+        {
+          "at": "s1+0.6",
+          "do": "pulse",
+          "target": "store"
+        },
+        {
+          "at": "s2",
+          "do": "set",
+          "target": "bal",
+          "param": "right",
+          "to": 104,
+          "dur": 0.4
+        },
+        {
+          "at": "s2+0.5",
+          "do": "set",
+          "target": "bal",
+          "param": "left",
+          "to": 104,
+          "dur": 0.4,
+          "why": "every watt matched instantly"
+        },
+        {
+          "at": "s2+1.2",
+          "do": "set",
+          "target": "bal",
+          "param": "right",
+          "to": 101,
+          "dur": 0.4
+        },
+        {
+          "at": "s2+1.7",
+          "do": "set",
+          "target": "bal",
+          "param": "left",
+          "to": 101,
+          "dur": 0.4
+        },
+        {
+          "at": "s3",
+          "do": "enter",
+          "target": [
+            "kettle",
+            "kettle_lbl"
+          ],
+          "anim": "pop"
+        },
+        {
+          "at": "s3+0.4",
+          "do": "move",
+          "target": "kettle",
+          "to": [
+            1140,
+            350
+          ],
+          "dur": 0.5,
+          "ease": "in"
+        },
+        {
+          "at": "s3+0.9",
+          "do": "set",
+          "target": "bal",
+          "param": "right",
+          "to": 112,
+          "dur": 0.6,
+          "ease": "spring"
+        },
+        {
+          "at": "s3+1.4",
+          "do": "enter",
+          "target": "draw",
+          "anim": "draw",
+          "dur": 0.6
+        },
+        {
+          "at": "s3+2",
+          "do": "trace",
+          "target": "draw",
+          "color": "#FFB627",
+          "dur": 0.6,
+          "repeat": 2
+        },
+        {
+          "at": "s4",
+          "do": "set",
+          "target": [
+            "f1",
+            "f2",
+            "f3",
+            "f4",
+            "f5"
+          ],
+          "param": "rpm",
+          "to": 195,
+          "dur": 2.2,
+          "ease": "smooth",
+          "why": "all generators slow together"
+        },
+        {
+          "at": "s4",
+          "do": "set",
+          "target": "fq",
+          "param": "value",
+          "to": 59.98,
+          "dur": 2.2,
+          "ease": "smooth"
+        },
+        {
+          "at": "s4+2.2",
+          "do": "pulse",
+          "target": "fq"
+        },
+        {
+          "at": "s4+0.4",
+          "do": "enter",
+          "target": "exag",
+          "anim": "fade",
+          "why": "a real kettle moves 60 Hz by far less than a dial can show"
+        }
+      ],
+      "hold": 1
+    },
+    {
+      "id": "control-response",
+      "concept": "Frequency acts as the grid's live gauge: automatic controls react within seconds, and operators restore the exact frequency over minutes.",
+      "mechanism": "A live frequency trace dips; governor plant output and battery discharge jump and the dip levels off (marker 1); the control-center setpoint dial turns up and the trace climbs back to 60.000 Hz (marker 2).",
+      "visual_cue": "Big live frequency chart on the left, the three responders stacked on the right in order of speed.",
+      "composition": "Chart left two-thirds; vertical stack of responders right: governor plant, battery, setpoint dial.",
+      "transition": "slide_left",
+      "portrait_focus": [
+        180,
+        80,
+        620,
+        680
+      ],
+      "actors": [
+        {
+          "id": "fmeter",
+          "kind": "meter",
+          "at": [
+            300,
+            90
+          ],
+          "params": {
+            "value": 60,
+            "unit": "Hz",
+            "text": "Grid frequency",
+            "decimals": 3,
+            "color": "#3FD0FF",
+            "size": "m"
+          }
+        },
+        {
+          "id": "chart",
+          "kind": "line_chart",
+          "at": [
+            620,
+            400
+          ],
+          "params": {
+            "w": 1020,
+            "h": 420,
+            "x_label": "Time",
+            "y_label": "Hz",
+            "series": [
+              {
+                "name": "Frequency",
+                "values": [
+                  60,
+                  60,
+                  59.985,
+                  59.972,
+                  59.965,
+                  59.962,
+                  59.962,
+                  59.964,
+                  59.968,
+                  59.974,
+                  59.981,
+                  59.988,
+                  59.994,
+                  59.998,
+                  60
+                ],
+                "color": "#3FD0FF"
+              }
+            ],
+            "y_min": 59.95,
+            "y_max": 60.01,
+            "x_ticks": [
+              "0",
+              "5 s",
+              "30 s",
+              "2 min",
+              "5 min",
+              "10 min"
+            ],
+            "progress": 0.08
+          }
+        },
+        {
+          "id": "b1",
+          "kind": "badge",
+          "at": [
+            470,
+            560
+          ],
+          "visible": false,
+          "params": {
+            "text": "1",
+            "color": "#FFB627",
+            "size": 46
+          }
+        },
+        {
+          "id": "b2",
+          "kind": "badge",
+          "at": [
+            1040,
+            240
+          ],
+          "visible": false,
+          "params": {
+            "text": "2",
+            "color": "#4BE08A",
+            "size": 46
+          }
+        },
+        {
+          "id": "gov",
+          "kind": "plant",
+          "at": [
+            1390,
+            170
+          ],
+          "params": {
+            "type": "gas",
+            "output": 0.6,
+            "size": 170,
+            "text": "1 Governor"
+          }
+        },
+        {
+          "id": "batt",
+          "kind": "battery",
+          "at": [
+            1390,
+            400
+          ],
+          "params": {
+            "charge": 0.8,
+            "flow": 0,
+            "size": 130
+          }
+        },
+        {
+          "id": "batt_lbl",
+          "kind": "label",
+          "params": {
+            "text": "1 Fast battery",
+            "target": "batt",
+            "side": "bottom",
+            "leader": false,
+            "color": "#FFB627"
+          }
+        },
+        {
+          "id": "agc",
+          "kind": "gauge",
+          "at": [
+            1390,
+            640
+          ],
+          "params": {
+            "min": 0,
+            "max": 100,
+            "value": 50,
+            "unit": "%",
+            "text": "2 Control center",
+            "decimals": 0,
+            "radius": 85,
+            "style": "dial"
+          }
+        }
+      ],
+      "beats": [
+        {
+          "at": "s1",
+          "do": "set",
+          "target": "chart",
+          "param": "progress",
+          "to": 0.32,
+          "dur": 1.6,
+          "ease": "linear",
+          "why": "the dip appears"
+        },
+        {
+          "at": "s1",
+          "do": "set",
+          "target": "fmeter",
+          "param": "value",
+          "to": 59.965,
+          "dur": 1.6
+        },
+        {
+          "at": "s2",
+          "do": "set",
+          "target": "gov",
+          "param": "output",
+          "to": 0.9,
+          "dur": 1,
+          "ease": "out"
+        },
+        {
+          "at": "s2",
+          "do": "pulse",
+          "target": "gov"
+        },
+        {
+          "at": "s2+0.3",
+          "do": "set",
+          "target": "batt",
+          "param": "flow",
+          "to": -0.9,
+          "dur": 0.5,
+          "ease": "out"
+        },
+        {
+          "at": "s2+0.3",
+          "do": "set",
+          "target": "batt",
+          "param": "charge",
+          "to": 0.7,
+          "dur": 3
+        },
+        {
+          "at": "s2+0.5",
+          "do": "set",
+          "target": "chart",
+          "param": "progress",
+          "to": 0.5,
+          "dur": 2.2,
+          "ease": "linear",
+          "why": "dip arrested within seconds"
+        },
+        {
+          "at": "s2+0.5",
+          "do": "set",
+          "target": "fmeter",
+          "param": "value",
+          "to": 59.962,
+          "dur": 1.5
+        },
+        {
+          "at": "s2+2.4",
+          "do": "enter",
+          "target": "b1",
+          "anim": "pop"
+        },
+        {
+          "at": "s3",
+          "do": "set",
+          "target": "agc",
+          "param": "value",
+          "to": 72,
+          "dur": 1.2,
+          "ease": "smooth"
+        },
+        {
+          "at": "s3+0.4",
+          "do": "set",
+          "target": "chart",
+          "param": "progress",
+          "to": 1,
+          "dur": 4,
+          "ease": "smooth",
+          "why": "control center restores 60 Hz"
+        },
+        {
+          "at": "s3+0.4",
+          "do": "set",
+          "target": "fmeter",
+          "param": "value",
+          "to": 60,
+          "dur": 4,
+          "ease": "smooth"
+        },
+        {
+          "at": "s3+0.4",
+          "do": "set",
+          "target": "batt",
+          "param": "flow",
+          "to": 0,
+          "dur": 2
+        },
+        {
+          "at": "s3+3.8",
+          "do": "enter",
+          "target": "b2",
+          "anim": "pop"
+        },
+        {
+          "at": "s3+4.2",
+          "do": "pulse",
+          "target": "fmeter"
+        }
+      ],
+      "hold": 1.5
+    },
+    {
+      "id": "heartbeat",
+      "concept": "The grid is one synchronized machine whose frequency must stay in a narrow band, and if balance can't be restored, it sheds load to save itself.",
+      "mechanism": "The frequency needle slides toward the 59.3 Hz red line; relays trip open, one neighborhood on the map goes dark, and the needle springs back to 60 for everyone else. The camera then pulls back to reveal generators across the continent spinning in lockstep; a kettle flicks on and every rotor and the needle nudge together.",
+      "visual_cue": "Frequency dial with a narrow green band and red 59.3 Hz zone beside a grid map whose relays trip; then a pull-back to a field of synchronized rotors.",
+      "composition": "Starts framed on dial plus grid map; camera pulls back to reveal a grid of generator rotors on the right.",
+      "transition": "fade",
+      "camera": [
+        0,
+        40,
+        1120,
+        630
+      ],
+      "portrait_focus": [
+        180,
+        100,
+        560,
+        640
+      ],
+      "actors": [
+        {
+          "id": "gz",
+          "kind": "gauge",
+          "at": [
+            300,
+            360
+          ],
+          "params": {
+            "min": 59,
+            "max": 61,
+            "value": 60,
+            "unit": "Hz",
+            "text": "Grid frequency",
+            "decimals": 2,
+            "radius": 150,
+            "style": "dial",
+            "zones": [
+              {
+                "from": 59,
+                "to": 59.3,
+                "color": "#FF5D5D"
+              },
+              {
+                "from": 59.3,
+                "to": 59.95,
+                "color": "#FFB627"
+              },
+              {
+                "from": 59.95,
+                "to": 60.05,
+                "color": "#4BE08A"
+              },
+              {
+                "from": 60.05,
+                "to": 60.7,
+                "color": "#FFB627"
+              },
+              {
+                "from": 60.7,
+                "to": 61,
+                "color": "#FF5D5D"
+              }
+            ]
+          }
+        },
+        {
+          "id": "shed_lbl",
+          "kind": "label",
+          "params": {
+            "text": "59.3 Hz: shed load",
+            "target": "gz",
+            "side": "top",
+            "leader": false,
+            "color": "#FF5D5D"
+          }
+        },
+        {
+          "id": "net",
+          "kind": "network",
+          "params": {
+            "nodes": [
+              {
+                "id": "p1",
+                "at": [
+                  660,
+                  170
+                ],
+                "text": "Plant",
+                "kind": "plant",
+                "state": "normal"
+              },
+              {
+                "id": "p2",
+                "at": [
+                  1000,
+                  170
+                ],
+                "text": "Plant",
+                "kind": "plant",
+                "state": "normal"
+              },
+              {
+                "id": "hub",
+                "at": [
+                  830,
+                  320
+                ],
+                "text": "Substation",
+                "kind": "substation",
+                "state": "normal"
+              },
+              {
+                "id": "c1",
+                "at": [
+                  640,
+                  520
+                ],
+                "text": "",
+                "kind": "city",
+                "state": "normal"
+              },
+              {
+                "id": "c2",
+                "at": [
+                  830,
+                  560
+                ],
+                "text": "",
+                "kind": "city",
+                "state": "normal"
+              },
+              {
+                "id": "c3",
+                "at": [
+                  1020,
+                  520
+                ],
+                "text": "",
+                "kind": "city",
+                "state": "normal"
+              }
+            ],
+            "edges": [
+              {
+                "from": "p1",
+                "to": "hub",
+                "class": "hv",
+                "flow": 0.6,
+                "state": "normal"
+              },
+              {
+                "from": "p2",
+                "to": "hub",
+                "class": "hv",
+                "flow": 0.6,
+                "state": "normal"
+              },
+              {
+                "from": "hub",
+                "to": "c1",
+                "class": "mv",
+                "flow": 0.5,
+                "state": "normal"
+              },
+              {
+                "from": "hub",
+                "to": "c2",
+                "class": "mv",
+                "flow": 0.5,
+                "state": "normal"
+              },
+              {
+                "from": "hub",
+                "to": "c3",
+                "class": "mv",
+                "flow": 0.5,
+                "state": "normal"
+              }
+            ]
+          }
+        },
+        {
+          "id": "relay",
+          "kind": "breaker",
+          "at": [
+            925,
+            420
+          ],
+          "params": {
+            "state": "closed",
+            "size": 60,
+            "text": "Relay"
+          }
+        },
+        {
+          "id": "warehouse",
+          "kind": "text",
+          "at": [
+            560,
+            92
+          ],
+          "visible": false,
+          "params": {
+            "text": "Not a warehouse",
+            "size": "l",
+            "weight": "bold",
+            "align": "center",
+            "color": "#E8EEF7"
+          }
+        },
+        {
+          "id": "g1",
+          "kind": "rotor",
+          "at": [
+            1210,
+            200
+          ],
+          "visible": false,
+          "params": {
+            "radius": 55,
+            "style": "magnet",
+            "poles": 2,
+            "rpm": 120,
+            "color": "#3FD0FF"
+          }
+        },
+        {
+          "id": "g2",
+          "kind": "rotor",
+          "at": [
+            1380,
+            200
+          ],
+          "visible": false,
+          "params": {
+            "radius": 55,
+            "style": "magnet",
+            "poles": 2,
+            "rpm": 120,
+            "color": "#3FD0FF"
+          }
+        },
+        {
+          "id": "g3",
+          "kind": "rotor",
+          "at": [
+            1210,
+            380
+          ],
+          "visible": false,
+          "params": {
+            "radius": 55,
+            "style": "magnet",
+            "poles": 2,
+            "rpm": 120,
+            "color": "#3FD0FF"
+          }
+        },
+        {
+          "id": "g4",
+          "kind": "rotor",
+          "at": [
+            1380,
+            380
+          ],
+          "visible": false,
+          "params": {
+            "radius": 55,
+            "style": "magnet",
+            "poles": 2,
+            "rpm": 120,
+            "color": "#3FD0FF"
+          }
+        },
+        {
+          "id": "g5",
+          "kind": "rotor",
+          "at": [
+            1210,
+            560
+          ],
+          "visible": false,
+          "params": {
+            "radius": 55,
+            "style": "magnet",
+            "poles": 2,
+            "rpm": 120,
+            "color": "#3FD0FF"
+          }
+        },
+        {
+          "id": "g6",
+          "kind": "rotor",
+          "at": [
+            1380,
+            560
+          ],
+          "visible": false,
+          "params": {
+            "radius": 55,
+            "style": "magnet",
+            "poles": 2,
+            "rpm": 120,
+            "color": "#3FD0FF"
+          }
+        },
+        {
+          "id": "sync_lbl",
+          "kind": "label",
+          "visible": false,
+          "params": {
+            "text": "One machine, in lockstep",
+            "target": "g2",
+            "side": "top",
+            "leader": false,
+            "color": "#3FD0FF"
+          }
+        },
+        {
+          "id": "kettle",
+          "kind": "icon",
+          "at": [
+            1500,
+            640
+          ],
+          "visible": false,
+          "params": {
+            "name": "kettle",
+            "size": 60,
+            "color": "#FF7A2F"
+          }
+        },
+        {
+          "id": "exag8",
+          "kind": "text",
+          "at": [
+            1560,
+            700
+          ],
+          "visible": false,
+          "params": {
+            "text": "Nudge exaggerated for illustration",
+            "size": "s",
+            "weight": "medium",
+            "align": "right",
+            "color": "warn"
+          }
+        }
+      ],
+      "beats": [
+        {
+          "at": "s1",
+          "do": "set",
+          "target": "gz",
+          "param": "value",
+          "to": 59.32,
+          "dur": 2.2,
+          "ease": "in",
+          "why": "frequency falls toward the red line"
+        },
+        {
+          "at": "s1+0.4",
+          "do": "pulse",
+          "target": "shed_lbl"
+        },
+        {
+          "at": "s1+2.3",
+          "do": "set",
+          "target": "relay",
+          "param": "state",
+          "to": "open",
+          "why": "relays trip to shed load"
+        },
+        {
+          "at": "s1+2.4",
+          "do": "set",
+          "target": "net.hub-c3",
+          "param": "flow",
+          "to": 0,
+          "dur": 0.3
+        },
+        {
+          "at": "s1+2.4",
+          "do": "set",
+          "target": "net.hub-c3",
+          "param": "state",
+          "to": "off"
+        },
+        {
+          "at": "s1+2.5",
+          "do": "set",
+          "target": "net.c3",
+          "param": "state",
+          "to": "off"
+        },
+        {
+          "at": "s1+2.8",
+          "do": "set",
+          "target": "gz",
+          "param": "value",
+          "to": 59.98,
+          "dur": 2,
+          "ease": "spring",
+          "why": "the rest of the grid recovers"
+        },
+        {
+          "at": "s2",
+          "do": "enter",
+          "target": "warehouse",
+          "anim": "fade"
+        },
+        {
+          "at": "s3",
+          "do": "exit",
+          "target": "warehouse",
+          "anim": "fade"
+        },
+        {
+          "at": "s3",
+          "do": "camera",
+          "region": [
+            0,
+            0,
+            1600,
+            900
+          ],
+          "dur": 2,
+          "ease": "smooth",
+          "why": "pull back to the whole continent"
+        },
+        {
+          "at": "s3+0.4",
+          "do": "enter",
+          "target": [
+            "g1",
+            "g2",
+            "g3",
+            "g4",
+            "g5",
+            "g6"
+          ],
+          "anim": "build",
+          "dur": 1.2
+        },
+        {
+          "at": "s3+1.2",
+          "do": "enter",
+          "target": "sync_lbl",
+          "anim": "fade"
+        },
+        {
+          "at": "s3+1.8",
+          "do": "pulse",
+          "target": [
+            "g1",
+            "g2",
+            "g3",
+            "g4",
+            "g5",
+            "g6"
+          ],
+          "why": "one shared heartbeat"
+        },
+        {
+          "at": "s3+2.8",
+          "do": "enter",
+          "target": "kettle",
+          "anim": "pop"
+        },
+        {
+          "at": "s3+3",
+          "do": "set",
+          "target": [
+            "g1",
+            "g2",
+            "g3",
+            "g4",
+            "g5",
+            "g6"
+          ],
+          "param": "rpm",
+          "to": 114,
+          "dur": 0.6,
+          "ease": "smooth"
+        },
+        {
+          "at": "s3+3",
+          "do": "set",
+          "target": "gz",
+          "param": "value",
+          "to": 59.95,
+          "dur": 0.6
+        },
+        {
+          "at": "s3+3.8",
+          "do": "set",
+          "target": [
+            "g1",
+            "g2",
+            "g3",
+            "g4",
+            "g5",
+            "g6"
+          ],
+          "param": "rpm",
+          "to": 120,
+          "dur": 1.2,
+          "ease": "smooth"
+        },
+        {
+          "at": "s3+3.8",
+          "do": "set",
+          "target": "gz",
+          "param": "value",
+          "to": 60,
+          "dur": 1.2,
+          "ease": "smooth"
+        },
+        {
+          "at": "s3+2.8",
+          "do": "enter",
+          "target": "exag8",
+          "anim": "fade",
+          "why": "one kettle's real nudge is far too small to see"
+        }
+      ],
+      "hold": 2
+    }
+  ]
+}

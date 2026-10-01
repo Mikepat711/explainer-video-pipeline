@@ -1,0 +1,11 @@
+.venv/
+.venv-*/
+__pycache__/
+*.pyc
+build/
+out/
+.cache/
+*.mp4
+*.wav
+*.onnx
+*.onnx.json

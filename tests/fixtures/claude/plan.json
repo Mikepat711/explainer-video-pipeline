@@ -1,0 +1,79 @@
+{
+  "style": {
+    "palette": {"bg": "#0B1020", "surface": "#141B30", "ink": "#E8ECF4", "muted": "#8A93A8", "accent": "#FFB020",
+                "accent2": "#4FC3F7", "warn": "#FF6B5A"},
+    "background": "night",
+    "typeface": "geometric",
+    "line": "regular",
+    "corners": "soft",
+    "motion": "measured",
+    "mood": "calm engineering cutaways with warm current against a night sky"
+  },
+  "poster": {"scene": "balance", "at": "s2+0.5"},
+  "scenes": [
+    {
+      "id": "spin",
+      "concept": "Generators turn rotation into alternating current.",
+      "mechanism": "The rotor spins up and the output wave and frequency readout rise with it.",
+      "visual_cue": "generator cutaway with a live sine wave",
+      "composition": "cutaway left, readout right",
+      "transition": "fade",
+      "actors": [
+        {"id": "gen", "kind": "generator", "at": [560, 400], "params": {"rpm": 0, "size": 360, "show_wave": true}},
+        {"id": "gen_label", "kind": "label", "params": {"text": "Generator", "target": "gen", "side": "bottom"}},
+        {"id": "hz", "kind": "meter", "at": [1180, 400], "params": {"value": 0, "unit": "Hz", "decimals": 0, "size": "l"}}
+      ],
+      "beats": [
+        {"at": "s1", "do": "set", "target": "gen", "param": "rpm", "to": 120, "dur": 2.0, "ease": "smooth",
+         "why": "the magnet starts turning"},
+        {"at": "s2", "do": "set", "target": "hz", "param": "value", "to": 60, "dur": 1.5},
+        {"at": "s2+0.5", "do": "pulse", "target": "hz"}
+      ]
+    },
+    {
+      "id": "step-up",
+      "concept": "High voltage means low current, so long lines lose less.",
+      "mechanism": "Flux couples the windings; current then flows down a line that barely warms.",
+      "visual_cue": "transformer cutaway feeding a transmission line",
+      "composition": "transformer left, line running right",
+      "transition": "slide_left",
+      "actors": [
+        {"id": "tx", "kind": "transformer", "at": [480, 380],
+         "params": {"style": "cutaway", "primary_turns": 6, "secondary_turns": 30, "v_in": "20 kV", "v_out": "400 kV",
+                    "flux": 0, "size": 420, "show_meters": true}},
+        {"id": "line", "kind": "powerline", "params": {"from": "tx.out", "to": [1520, 380], "voltage": "hv",
+                                                      "supports": 3, "flow": 0, "heat": 0}},
+        {"id": "line_label", "kind": "label", "params": {"text": "400 kV line", "target": "line.mid", "side": "top"}}
+      ],
+      "beats": [
+        {"at": "s1", "do": "set", "target": "tx", "param": "flux", "to": 1, "dur": 1.5},
+        {"at": "s2", "do": "set", "target": "line", "param": "flow", "to": 0.8, "dur": 2.0},
+        {"at": "s2+1", "do": "set", "target": "line", "param": "heat", "to": 0.1, "dur": 1.0,
+         "why": "only a faint glow: little current, little heat"}
+      ]
+    },
+    {
+      "id": "balance",
+      "concept": "Supply must match demand or the frequency drifts.",
+      "mechanism": "Demand outweighs supply, the frequency needle sags, then supply catches up and it recovers.",
+      "visual_cue": "city, see-saw and frequency dial",
+      "composition": "city left, balance and dial stacked right",
+      "transition": "fade",
+      "hold": 1.5,
+      "actors": [
+        {"id": "city", "kind": "city", "at": [420, 470], "params": {"buildings": 12, "w": 560, "h": 320, "lights": 0.3}},
+        {"id": "scale", "kind": "balance", "at": [1100, 300],
+         "params": {"left_text": "Supply", "right_text": "Demand", "left": 50, "right": 50, "width": 520}},
+        {"id": "freq", "kind": "gauge", "at": [1100, 590],
+         "params": {"min": 59.8, "max": 60.2, "value": 60, "unit": "Hz", "decimals": 2, "radius": 120}}
+      ],
+      "beats": [
+        {"at": "s1", "do": "set", "target": "city", "param": "lights", "to": 1, "dur": 1.5},
+        {"at": "s1+0.5", "do": "set", "target": "scale", "param": "right", "to": 70, "dur": 1.0},
+        {"at": "s2", "do": "set", "target": "freq", "param": "value", "to": 59.95, "dur": 1.5},
+        {"at": "e2", "do": "set", "target": "scale", "param": "left", "to": 70, "dur": 1.5},
+        {"at": "e2", "do": "set", "target": "freq", "param": "value", "to": 60, "dur": 1.5}
+      ]
+    }
+  ]
+}

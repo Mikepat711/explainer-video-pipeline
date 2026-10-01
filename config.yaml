@@ -1,0 +1,98 @@
+# Default pipeline configuration. Override with `--config other.yaml`
+# (deep-merged on top of this file) or `--set section.key=value`.
+
+video:
+  aspect: "16:9"          # "16:9" (1920x1080) or "9:16" (1080x1920)
+  fps: 30
+  crf: 19                 # final H.264 quality (lower = better/larger)
+  preset: medium
+  audio_bitrate: 192k
+
+length:
+  target_seconds: 150     # nominal length: sets how much a generated script covers
+  words_per_minute: 140   # content budget per nominal minute (150 s -> ~350 words; scene holds add the rest)
+  max_seconds: 210        # videos may flex up to this instead of rushing
+  scene_lead_in: 0.8      # silence at the start of each scene, while the cut settles (s)
+  sentence_gap: 0.4       # base pause between sentences (s) ...
+  sentence_gap_extra: 0.25  # ... plus up to this much more after long sentences
+  scene_tail: 1.3         # hold after a scene's last sentence, before the cut (s)
+  min_scene: 6.0          # no scene is shorter than this (s)
+  reveal_hold: 2.5        # every on-screen element stays up at least this long before the cut (s)
+  reading_wpm: 160        # on-screen text reading speed; scenes stretch if their text needs longer
+
+style:
+  theme: midnight         # midnight | paper
+  font: Inter             # falls back to DejaVu Sans if not installed
+  accent: cyan            # cyan | violet | amber | mint | coral
+  grid: true              # subtle dot grid in the background
+  progress_bar: true
+  motion: 1.6             # animation duration multiplier (1.0 = snappy, 1.6 = calm, 2.0 = very slow)
+  overshoot: 0.5          # bounce on pop-in elements (0 = none, 1.4 = springy)
+  crossfade: 0.9          # dissolve between scenes (s)
+
+voice:
+  use: kokoro:af_heart    # <- THE NARRATOR VOICE: any key under `presets` below (or engine:voice).
+                          #    Per machine: EXPLAINER_VOICE=kokoro:bm_george in ~/.config/explainer/config
+  target_wpm: 165         # voices are paced to this, counted over speech plus pauses between sentences
+  pace_tolerance: 0.04    # the preset's own speed is kept while the result is within ±4% of the target
+  presets:                # per-voice settings (a preset may set its own target_wpm); compare with `make voices`
+    kokoro:af_heart: {speed: 0.82, target_wpm: 160, pace_tolerance: 0.03}  # American female, warm (155-165 wpm)
+    kokoro:af_bella: {speed: 0.88}     # American female, bright and clear
+    kokoro:am_michael: {speed: 0.96}   # American male, steady and neutral
+    kokoro:bm_george: {speed: 0.96}    # British male, mature documentary narrator
+    kokoro:bm_fable: {speed: 0.85}     # British male, younger and lively
+    chatterbox: {exaggeration: 0.4, cfg_weight: 0.3}  # expressive male; `make setup-chatterbox`; time-stretched to pace
+    parler:Jon: {}                     # Parler-TTS mini, male; `make setup-parler`; time-stretched to pace
+  kokoro_model: kokoro-v1.0.onnx  # or kokoro-v1.0.int8.onnx (smaller, slightly less clean)
+  piper_voice: en_US-lessac-high
+  espeak_voice: en-us
+  espeak_wpm: 165
+  openai_model: gpt-4o-mini-tts
+  openai_voice: alloy
+  command: ""             # e.g. 'say -o {out} {text}' (see README)
+  chatterbox_python: .venv-chatterbox/bin/python  # PyTorch engines run in their own virtualenvs
+  parler_python: .venv-parler/bin/python
+  parler_model: parler-tts/parler-tts-mini-v1.1
+  parler_description: >-
+    {speaker}'s voice is warm and friendly, speaking at a moderate, relaxed pace with natural intonation,
+    in a very clear, close-sounding recording with no background noise.
+  torch_device: auto      # auto = cuda > mps (Apple Silicon) > cpu
+  pronounce: {}           # extra spoken forms, e.g. {SCADA: "skay-dah"}; numbers and units are spelled out already
+
+audio:
+  sample_rate: 48000
+  target_lufs: -16.0
+  true_peak: -1.5
+  music: true
+  music_bpm: 86
+  music_key: D            # root note of the procedural score
+  voice_rms_db: -19.0     # narration level (RMS while speaking), set before music is mixed in
+  music_gain_db: -7.0     # music level when no one is speaking
+  duck_db: -10.0          # extra attenuation under the voice
+  sfx: true
+  sfx_gain_db: -15.0
+
+captions:
+  burn_in: true
+  max_chars_16x9: 44
+  max_chars_9x16: 26
+  max_lines: 2
+
+llm:                      # research, script and visual plan are written by Claude Code (`claude -p`)
+  writer: claude          # claude | off (off = the last-resort offline fallback)
+  model: opus             # `claude --model` alias; per machine: EXPLAINER_LLM_MODEL=opus in ~/.config/explainer/config
+  claude_bin: ""          # empty = `claude` on PATH (or the standard ~/.local/bin install); EXPLAINER_CLAUDE_BIN
+  timeout: 900            # seconds per call before it is killed (the research call browses the web)
+  retries: 2              # extra attempts after a failed or invalid reply (validation errors are fed back)
+  web_research: true      # let the research call use WebSearch/WebFetch
+  extra_args: []          # appended to every `claude` call
+
+research:
+  fetch_wikipedia: true   # fallback writer only: used when Claude is unavailable and a topic has no local sources
+  max_facts: 28
+
+render:
+  engine: auto            # auto: draw the visual plan (legacy shots.yaml packs and fallback plans use templates)
+                          # plan | templates force one renderer
+  workers: 3              # parallel scene renders
+  scene_timeout: 900      # seconds per scene before a hung render worker fails the stage

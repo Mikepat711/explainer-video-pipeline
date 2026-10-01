@@ -1,0 +1,16 @@
+An electrical grid is an interconnected network that delivers electricity from producers to consumers. It consists of power stations, transmission lines, substations and distribution lines that reach homes and businesses. Grid operators keep generation and demand matched at every moment to hold the frequency steady.
+
+== History ==
+The first grids were small local systems built around a single power station in a city centre.
+
+== Generation ==
+Power stations convert the energy in fuel, falling water, wind or sunlight into rotating motion or direct current. Most large generators are synchronous machines that turn in step with the frequency of the grid. Inverters connect solar panels and batteries to the grid by synthesizing alternating current.
+
+== Transmission ==
+Transformers at the power station raise the voltage so that the same power flows with a smaller current. A smaller current heats the conductors less, so high-voltage lines lose far less energy over long distances. Transmission lines are carried on tall steel towers and connect regions hundreds of kilometres apart.
+
+== Distribution ==
+Substations near towns lower the voltage and split the power among many distribution feeders. Pole-mounted or pad-mounted transformers make the final step down to the voltage used inside buildings. Circuit breakers isolate faulty sections so that a single failure does not black out a whole area.
+
+== See also ==
+Smart grid, Electricity market.

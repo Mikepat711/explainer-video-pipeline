@@ -1,0 +1,29 @@
+{
+  "topic": "how the electrical grid works",
+  "audience": "curious adults with no engineering background",
+  "core_question": "How does electricity made far away arrive at a wall socket the instant it is needed?",
+  "short_answer": "Generators make alternating current, transformers raise its voltage for efficient long-distance transmission and lower it again near homes, and operators match supply to demand every second, using frequency as the signal.",
+  "key_concepts": [
+    {"name": "Generator", "explanation": "A spinning magnet inside copper coils induces alternating current.", "mechanism": "The rotor's field sweeps the stator windings, pushing electrons back and forth 60 times a second.", "visual_metaphor": "A cutaway rotor spinning while a sine wave grows beside it."},
+    {"name": "Step-up transformer", "explanation": "Raising voltage lowers current for the same power, which cuts line losses.", "mechanism": "Two windings share an iron core; the turns ratio sets the voltage ratio.", "visual_metaphor": "Few primary turns, many secondary turns, a voltmeter jumping from 20 kV to 400 kV."},
+    {"name": "Frequency balance", "explanation": "Grid frequency falls when demand exceeds supply and rises when supply exceeds demand.", "mechanism": "Extra load brakes every synchronous generator a little, so they all slow together until governors add power.", "visual_metaphor": "A see-saw of supply and demand driving a frequency needle."}
+  ],
+  "process": [
+    {"step": "Generate", "detail": "Plants turn heat, water or wind into rotation and rotation into AC."},
+    {"step": "Step up", "detail": "Transformers raise the voltage to hundreds of kilovolts."},
+    {"step": "Transmit", "detail": "High-voltage lines carry power hundreds of kilometers."},
+    {"step": "Step down and distribute", "detail": "Substations and pole transformers lower the voltage for homes."}
+  ],
+  "numbers": [
+    {"fact": "North American grid frequency", "value": "60", "unit": "Hz", "context": "50 Hz in most other regions", "source": "NERC"},
+    {"fact": "Typical long-distance transmission voltage", "value": "400,000", "unit": "V", "source": "IEA"},
+    {"fact": "Household outlet voltage in North America", "value": "120", "unit": "V", "source": "ANSI C84.1"}
+  ],
+  "misconceptions": [
+    {"myth": "Power plants store electricity until you need it.", "truth": "The grid stores almost nothing; generation must match use moment by moment."}
+  ],
+  "analogies": ["Frequency is like the speed of a bicycle team riding up and down hills."],
+  "sources": [
+    {"title": "Electric power transmission and distribution basics", "publisher": "U.S. Energy Information Administration", "url": "https://www.eia.gov/energyexplained/electricity/delivery-to-consumers.php"}
+  ]
+}
