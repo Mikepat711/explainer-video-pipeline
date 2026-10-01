@@ -77,18 +77,19 @@ To use a different voice on one machine without touching the repo, add one line 
 EXPLAINER_VOICE=kokoro:bm_george
 ```
 
-For a single run: `ARGS="--set voice.use=kokoro:bm_fable"`. Every voice is paced to a target in words
-per minute, counting the spoken words (numbers spelled out) over speech plus the pauses between
-sentences. The default narrator, af_heart, targets 160 wpm and must land between 155 and 165. The other
-presets use `voice.target_wpm`, 165 ± 4%. The preset's own speed is kept when the result is inside that
-window. Otherwise the narration is re-synthesized once at a corrected speed, and a gentle time-stretch
-closes any gap that remains. The same speed reads at very different paces depending on the wording:
-af_heart at 0.82 gives 161.7 wpm on the grid intro but 137 wpm on the GPS script. So every script is
-measured, and `timing.json` and `qa.md` record the pace, speed and stretch that were used.
+For a single run: `ARGS="--set voice.use=kokoro:bm_fable"`. The default narrator, af_heart, speaks at
+its natural pace: preset speed 0.85 (about 155 words per minute while talking) with `target_wpm: 0`, so it
+is never re-synthesized faster or time-stretched to hit a length. Squeezing speech to a words-per-minute
+target that counts the pauses made narration sound rushed: the more pauses a script had, the faster the
+words were pushed. Scripts are written in short sentences instead, and each sentence break is a pause.
+The other presets still use `voice.target_wpm`, 165 ± 4%: the preset's own speed is kept when the result is
+inside that window; otherwise the narration is re-synthesized once at a corrected speed, and a gentle
+time-stretch closes any gap that remains. Set a preset's `target_wpm: 0` to keep its natural speed.
+`timing.json` and `qa.md` record the pace, speed and stretch that were used.
 
 | `voice.use` | Voice | Notes |
 |---|---|---|
-| `kokoro:af_heart` | American female, warm and soft | Default; speed 0.82, 160 wpm (155–165) |
+| `kokoro:af_heart` | American female, warm and soft | Default; speed 0.85, natural pace (~155 wpm while talking) |
 | `kokoro:af_bella` | American female, bright and clear | Speed 0.88 |
 | `kokoro:am_michael` | American male, steady and neutral | Speed 0.96 |
 | `kokoro:bm_george` | British male, mature documentary narrator | Speed 0.96 |

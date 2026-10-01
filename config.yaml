@@ -11,9 +11,9 @@ video:
 length:
   target_seconds: 150     # nominal length: sets how much a generated script covers
   words_per_minute: 140   # content budget per nominal minute (150 s -> ~350 words; scene holds add the rest)
-  max_seconds: 210        # videos may flex up to this instead of rushing
+  max_seconds: 300        # videos may flex up to this instead of rushing (a warning only; speech is never squeezed to fit)
   scene_lead_in: 0.8      # silence at the start of each scene, while the cut settles (s)
-  sentence_gap: 0.4       # base pause between sentences (s) ...
+  sentence_gap: 0.5       # base pause between sentences (s) ...
   sentence_gap_extra: 0.25  # ... plus up to this much more after long sentences
   scene_tail: 1.3         # hold after a scene's last sentence, before the cut (s)
   min_scene: 6.0          # no scene is shorter than this (s)
@@ -33,10 +33,10 @@ style:
 voice:
   use: kokoro:af_heart    # <- THE NARRATOR VOICE: any key under `presets` below (or engine:voice).
                           #    Per machine: EXPLAINER_VOICE=kokoro:bm_george in ~/.config/explainer/config
-  target_wpm: 165         # voices are paced to this, counted over speech plus pauses between sentences
+  target_wpm: 165         # voices are paced to this, counted over speech plus pauses between sentences (0 = keep the preset's natural speed)
   pace_tolerance: 0.04    # the preset's own speed is kept while the result is within ±4% of the target
   presets:                # per-voice settings (a preset may set its own target_wpm); compare with `make voices`
-    kokoro:af_heart: {speed: 0.82, target_wpm: 160, pace_tolerance: 0.03}  # American female, warm (155-165 wpm)
+    kokoro:af_heart: {speed: 0.85, target_wpm: 0}  # American female, warm; natural pace (~155 wpm while talking), never re-paced or time-stretched
     kokoro:af_bella: {speed: 0.88}     # American female, bright and clear
     kokoro:am_michael: {speed: 0.96}   # American male, steady and neutral
     kokoro:bm_george: {speed: 0.96}    # British male, mature documentary narrator

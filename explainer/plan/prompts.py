@@ -72,17 +72,29 @@ scene, the idea for a purpose-built teaching animation.
 
 Topic: {topic}
 Length: about {target} words of narration (acceptable {lo}-{hi}), roughly {seconds} seconds when spoken at a
-relaxed conversational pace (~160 words per minute).
+calm, relaxed conversational pace (~150 words per minute, with a short pause after every sentence).
 
 Structure is yours to design for THIS topic. Choose the number of scenes (each scene teaches one idea),
 how the lesson opens (a concrete moment, a question, a surprising number; never a generic welcome or a
 title card) and how it ends (an insight or consequence, not a list of the scene headings). Build understanding
 step by step: each scene should depend on the one before.
 
-Narration rules:
-- Spoken English, warm and precise: short concrete sentences, active voice, one idea per sentence.
-- Every item in "sentences" is exactly ONE sentence (they are the sync points for the animation), under 30 words.
-- Numbers may be written as digits with units (e.g. "400,000 volts", "60 Hz"); they are read aloud properly.
+Narration rules (it is read aloud by a TTS narrator; write for the ear, not the page):
+- Audience: curious viewers with NO prior knowledge. Warm, calm, conversational; contractions are welcome.
+- Short sentences, ONE idea per sentence: most 5-15 words, none over 22. A pause follows every sentence, so
+  each sentence break is a breath. Split anything with stacked clauses into separate sentences.
+- No crammed lists. Never stack three or more items, names or numbers in one breath; give each its own
+  sentence or a gentle "first ... then ..." rhythm. No colons, semicolons, dashes or parentheses in narration.
+- Explain with plain everyday analogies (an auction, a referee, traffic) before any technical detail.
+- Define each piece of jargon in plain words the first time it appears, or drop it. Spell out an acronym
+  before using it ("independent system operators, or ISOs").
+- Fewer numbers: keep only the ones that teach something; the animation and labels can show the rest.
+- Write money, units and symbols as spoken words in narration: "sixty dollars", "five hundred megawatts",
+  "ten percent", "sixty hertz", "about thirty", "April first, nineteen ninety-seven". On-screen labels
+  (key_terms, visual_idea) keep the compact symbols ("$60", "500 MW", "60 Hz").
+- If the lesson is part of a series, announce the part as its own short sentence ("This is Part 3.") and
+  start the hook in the next sentence.
+- Every item in "sentences" is exactly ONE sentence (they are the sync points for the animation).
 - No "in this video", no calls to subscribe, no headings or lists read aloud, no rhetorical filler.
 - Teach the mechanism. When you name a part, say what it does and why it matters.
 - Keep magnitudes honest. If one small cause stands in for a big effect (one kettle and the grid's frequency),

@@ -60,13 +60,12 @@ class VoiceConfigTests(unittest.TestCase):
         p.start()
         self.addCleanup(p.stop)
 
-    def test_repo_default_is_af_heart_at_160_wpm(self):
+    def test_repo_default_is_af_heart_at_its_natural_pace(self):
         cfg = load_config()
         self.assertEqual(cfg["voice"]["use"], "kokoro:af_heart")
         v = resolve_voice(cfg)
-        self.assertEqual((v["engine"], v["kokoro_voice"], v["speed"]), ("kokoro", "af_heart", 0.82))
-        self.assertAlmostEqual(v["target_wpm"] * (1 - v["pace_tolerance"]), 155.2)
-        self.assertAlmostEqual(v["target_wpm"] * (1 + v["pace_tolerance"]), 164.8)
+        self.assertEqual((v["engine"], v["kokoro_voice"], v["speed"]), ("kokoro", "af_heart", 0.85))
+        self.assertEqual(v["target_wpm"], 0)  # never re-paced or time-stretched
         self.assertEqual(resolve_voice(with_voice(cfg, "kokoro:af_bella"))["target_wpm"], 165)
 
     def test_every_preset_is_selectable(self):
@@ -145,6 +144,13 @@ class PaceTests(unittest.TestCase):
         self.assertIsNone(info["speed"])
         self.assertLess(info["tempo"], 1.0)
         self.assertAlmostEqual(info["wpm"], 165, delta=165 * 0.04)
+
+    def test_zero_target_keeps_natural_speed_without_stretching(self):
+        self.cfg["voice"]["presets"]["fake:x"] = {"speed": 1.0, "target_wpm": 0}
+        for rate in (120, 215):
+            _, info = self.pace("fake:x", rate)
+            self.assertEqual((info["speed"], info["tempo"], info["target_wpm"]), (1.0, 1.0, None))
+            self.assertAlmostEqual(info["speaking_wpm"], rate, delta=rate * 0.08)
 
     def test_cached_sentences_are_not_resynthesized(self):
         self.pace("fake:x", 172)
