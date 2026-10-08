@@ -5,7 +5,7 @@ import time
 from pathlib import Path
 
 from .stages.voice import join_clips, paced_clips
-from .tts import ENGINES, KokoroEngine, resolve_voice, with_voice
+from .tts import ENGINES, ElevenLabsEngine, KokoroEngine, resolve_voice, with_voice
 from .util import REPO_ROOT, log, run, split_sentences, write_json, write_wav
 
 SAMPLE_TEXT = (
@@ -32,6 +32,11 @@ def list_voices(cfg: dict) -> None:
         settings = ", ".join(f"{k}={v}" for k, v in (cfg["voice"]["presets"][spec] or {}).items())
         hint = "" if ok else f"  (not installed: {getattr(ENGINES.get(engine), 'setup_hint', '') or 'pip install'})"
         print(f"  {spec:24s} {settings}{hint}")
+    el = (cfg["voice"].get("elevenlabs") or {}).get("voices") or {}
+    key = "" if ElevenLabsEngine.available(cfg) else f"  (no API key: see README > ElevenLabs; falls back to " \
+        f"{cfg['voice'].get('fallback') or 'nothing'})"
+    print(f"\nelevenlabs (elevenlabs:<name> or elevenlabs:<voice id>){key}:")
+    print("  " + ", ".join(f"{n} ({i})" for n, i in el.items()))
     if KokoroEngine.available():
         print("\nall kokoro voices (use kokoro:<id>; af_/am_ American, bf_/bm_ British female/male):")
         kokoro = KokoroEngine(dict(cfg, voice=resolve_voice(with_voice(cfg, "kokoro:af_heart"))))
@@ -52,7 +57,9 @@ def audition(cfg: dict, specs: list[str], text: str, out_dir: Path) -> list[dict
         c = with_voice(cfg, spec)
         engine = resolve_voice(c)["engine"]
         if not ENGINES[engine].available(c):
-            log(f"  skip {spec}: engine not installed {getattr(ENGINES[engine], 'setup_hint', '')}".rstrip())
+            why = "no ElevenLabs API key (see README > ElevenLabs)" if engine == "elevenlabs" else \
+                f"engine not installed {getattr(ENGINES[engine], 'setup_hint', '')}".rstrip()
+            log(f"  skip {spec}: {why}")
             continue
         t0 = time.time()
         clips, info = paced_clips(c, [sentences], sr, REPO_ROOT / ".cache" / "tts-audition")

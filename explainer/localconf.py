@@ -4,9 +4,10 @@
     EXPLAINER_VOICE=kokoro:bm_fable      # overrides voice.use from config.yaml
     EXPLAINER_LLM_MODEL=opus             # model alias passed to `claude --model`
     EXPLAINER_CLAUDE_BIN=/path/to/claude # only if `claude` is not on PATH
+    EXPLAINER_WRITER=grok                # claude (default) | grok | off
 
 Environment variables with the same names win over the file. `EXPLAINER_CONFIG` points at
-a different file. Nothing secret belongs here: Claude Code keeps its own sign-in.
+a different file. Nothing secret belongs here: Claude Code and Grok Build keep their own sign-in.
 """
 from __future__ import annotations
 
@@ -21,8 +22,16 @@ KEYS = {
     "EXPLAINER_CLAUDE_BIN": "path to the Claude Code CLI if `claude` is not on PATH",
     "EXPLAINER_LLM_TIMEOUT": "seconds per Claude call before it is killed and retried",
     "EXPLAINER_LLM_RETRIES": "extra attempts after a failed or invalid Claude reply",
-    "EXPLAINER_LLM": "claude | off (off forces the offline fallback writer)",
+    "EXPLAINER_LLM": "claude | grok | off (older name for EXPLAINER_WRITER)",
+    "EXPLAINER_WRITER": "claude | grok | off: who writes research, script and visual plan (llm.writer)",
+    "EXPLAINER_GRIND": "grok | claude | off: who runs the layout-fix stage on the plan (llm.grind, default off)",
+    "EXPLAINER_GROK_BIN": "path to the Grok Build CLI if not on PATH or ~/.grok/bin/grok",
+    "EXPLAINER_GROK_MODEL": "Grok model id for the writer (default: grok-4.7)",
     "EXPLAINER_FFMPEG": "ffmpeg binary with libass, for burned-in captions",
+    "EXPLAINER_DELIVER_DIR": "folder that receives a copy of each finished bundle MP4",
+    "EXPLAINER_BUNDLES_DIR": "where incoming project bundles land (default ~/explainer-bundles)",
+    "EXPLAINER_WHISPER_MODEL": "path to a whisper.cpp ggml model for word timing / ASR",
+    "EXPLAINER_FONT_DIR": "folder containing Poppins-Regular.ttf (and Medium/SemiBold/Bold/Italic)",
 }
 _LINE = re.compile(r"^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$")
 

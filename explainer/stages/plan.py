@@ -13,7 +13,7 @@ from ..plan.prompts import plan_prompt
 from ..plan.schemas import PLAN
 from ..schema import validate
 from ..util import log, read_json, write_json
-from ..writer import banner, fallback_is_stale, get_writer, require_claude, write_meta, writer_identity
+from ..writer import banner, fallback_is_stale, get_writer, require_claude, write_meta, writer_identity, writer_name
 from .common import optional_file
 
 
@@ -28,7 +28,7 @@ class Plan(Stage):
         return next(filter(None, map(ctx.pack_file, ("plan.json", "plan.yaml", "plan.yml"))), None)
 
     def inputs(self, ctx):
-        return {"writer": writer_identity(ctx.cfg), "captions": ctx.cfg["captions"]["burn_in"],
+        return {"writer": writer_identity(ctx.cfg, self.name), "captions": ctx.cfg["captions"]["burn_in"],
                 "override": optional_file(self._override(ctx)),
                 "legacy_shots": optional_file(ctx.pack_file("shots.yaml")), "brief": ctx.brief.inputs()}
 
@@ -63,7 +63,7 @@ class Plan(Stage):
             write_meta(c, self.name, "topic-pack")
             return
         research = read_json(c / "research.json")
-        writer, reason = get_writer(ctx.cfg)
+        writer, reason = get_writer(ctx.cfg, self.name)
         if writer:
             try:
                 prompt = plan_prompt(ctx.topic, script, research, ctx.cfg["captions"]["burn_in"],
@@ -76,7 +76,7 @@ class Plan(Stage):
             except ClaudeError as exc:
                 reason = str(exc)
         require_claude(ctx, self.name, reason)
-        banner(self.name, reason)
+        banner(self.name, reason, writer_name(ctx.cfg, self.name))
         self._write(c, offline.plan_from_script(script), script)
         write_meta(c, self.name, "offline", fallback=True, reason=reason)
 

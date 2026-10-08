@@ -1,0 +1,7 @@
+# Extra dependencies for `explainer build` (skia production path).
+# After the base venv:  pip install -r requirements-bundle.txt
+# or:  make setup-bundle
+skia-python>=87
+scipy>=1.11,<2
+soundfile>=0.12,<1
+pyloudnorm>=0.1,<1

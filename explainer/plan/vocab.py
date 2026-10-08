@@ -56,7 +56,8 @@ KINDS: dict[str, Kind] = {
         "shape": p("enum", values=("rect", "rounded", "circle", "ellipse", "ring", "polygon")),
         "w": p("num", min=1, max=3200), "h": p("num", min=1, max=1800), "r": p("num", min=1, max=900),
         "points": p("points", doc="polygon vertices relative to `at`"), "fill": COLOR, "stroke": COLOR,
-        "stroke_width": p("num", min=0, max=40), "dashed": p("bool")},
+        "stroke_width": p("num", min=0, max=40), "dashed": p("bool"),
+        "fill_level": p("num", min=0, max=1, doc="0..1 share of the shape filled from the bottom (tank, glass)")},
         ("w", "h", "r", "fill_level"), required=("shape",), group="geometry"),
     "path": Kind("A drawn line or curve: wire, pipe, route, outline. Other actors can flow along it.", {
         "points": p("points", doc="absolute design-space points, at least 2"), "smooth": p("bool"), "closed": p("bool"),

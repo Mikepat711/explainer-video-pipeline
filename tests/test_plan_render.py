@@ -292,5 +292,37 @@ class FramesTests(unittest.TestCase):
         self.assertEqual(check_plan(normalize_plan(plan), script), [])
 
 
+class VocabConsistencyTests(unittest.TestCase):
+    def test_every_animatable_param_is_a_declared_param(self):
+        for name, kind in KINDS.items():
+            item_params = {k for spec in kind.params.values() for k in (spec.get("item") or {})}
+            for param in kind.animatable:  # list-item params (network node/edge state) are set per item
+                self.assertIn(param, set(kind.params) | item_params,
+                              f"{name}.{param} is animatable but the validator would reject it")
+
+    def test_shape_fill_level_param_and_set_beat_validate(self):
+        plan, script = fixture_plan(), fixture_script()
+        sc = plan["scenes"][0]
+        sc["actors"].append({"id": "tank", "kind": "shape", "at": [400, 300],
+                             "params": {"shape": "rect", "w": 80, "h": 160, "fill_level": 0.1}})
+        sc["beats"].append({"at": "s1", "do": "set", "target": "tank", "param": "fill_level", "to": 0.9, "dur": 1.0})
+        self.assertEqual(validate(plan, PLAN), [])
+        self.assertEqual(check_plan(normalize_plan(plan), script), [])
+        bad = copy.deepcopy(plan)
+        bad["scenes"][0]["actors"][-1]["params"]["fill_level"] = 2
+        self.assertTrue(any("fill_level" in e for e in check_plan(normalize_plan(bad), script)))
+
+    def test_small_bar_values_keep_their_decimals(self):
+        from explainer.gfx.kit.basic import bar_decimals
+        self.assertEqual(bar_decimals([0.27, 0.1]), 2)
+        self.assertEqual(bar_decimals([2.5, 7]), 1)
+        self.assertEqual(bar_decimals([12, 40]), 0)
+        self.assertEqual(bar_decimals([12.5, 40]), 0)
+
+    def test_no_transition_dips_to_black(self):
+        for kind in ("fade", "slide_left", "slide_up", "zoom_in", "zoom_out"):
+            self.assertNotIn("black", transition({"transition": kind}, 0.9, 30)[0])
+
+
 if __name__ == "__main__":
     unittest.main()

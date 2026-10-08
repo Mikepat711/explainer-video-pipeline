@@ -13,7 +13,7 @@ from pathlib import Path
 from unittest import mock
 
 from explainer import cli
-from explainer.claude import ClaudeError, ClaudeUnavailable, ClaudeWriter, extract_json
+from explainer.claude import ClaudeError, ClaudeUnavailable, ClaudeWriter, GrokWriter, extract_json
 from explainer.config import load_config
 from explainer.pipeline import Context, execute
 from explainer.plan.checks import check_plan, check_script
@@ -76,6 +76,80 @@ class FakeClaudeCase(unittest.TestCase):
                 ran.append(stg.name)
             if stg.name == "plan":
                 return ran
+
+
+class GrokWriterTests(FakeClaudeCase):
+    """The Grok Build writer: same prompts and checks, its own command line and envelope."""
+
+    def gcfg(self, **llm):
+        return self.cfg(writer="grok", grok_bin=str(self.bin), **llm)
+
+    def test_selected_by_config_and_headless_command(self):
+        writer, _ = get_writer(self.gcfg())
+        self.assertIsInstance(writer, GrokWriter)
+        prompt = research_prompt("how the grid works", [])
+        brief, meta = writer.generate("research", prompt, RESEARCH, web=True)
+        self.assertEqual(brief["topic"], "how the electrical grid works")
+        self.assertEqual((meta["writer"], meta["cost_usd"]), ("grok:grok-4.7", 0.02))
+        call = self.calls()[0]
+        argv = call["argv"]
+        self.assertEqual(argv[argv.index("-p") + 1], prompt)  # the prompt is passed unchanged
+        self.assertEqual(argv[argv.index("-m") + 1], "grok-4.7")
+        self.assertEqual(argv[argv.index("--permission-mode") + 1], "auto")
+        self.assertEqual(argv[argv.index("--output-format") + 1], "json")
+        self.assertIn("run_terminal_command", argv[argv.index("--disallowed-tools") + 1])
+        self.assertNotIn("web_search", argv[argv.index("--disallowed-tools") + 1])
+        self.assertNotIn("--disable-web-search", argv)
+        self.assertIn("Bash", argv)
+        self.assertIn("Do not run shell commands", argv[argv.index("--rules") + 1])
+        self.assertTrue(call["stdin_empty"])
+        self.assertNotEqual(Path(call["cwd"]).resolve(), Path.cwd().resolve())
+
+    def test_no_web_tools_without_web(self):
+        GrokWriter(self.gcfg()).generate("script", "TASK: script\n", SCRIPT)
+        argv = self.calls()[0]["argv"]
+        self.assertIn("--disable-web-search", argv)
+        self.assertIn("web_search", argv[argv.index("--disallowed-tools") + 1])
+
+    def test_fenced_retry_and_auth_handling(self):
+        self.mode("fenced")
+        payload, _ = GrokWriter(self.gcfg()).generate("research", "TASK: research\n", RESEARCH)
+        self.assertEqual(len(payload["key_concepts"]), 3)
+        self.mode("error-once")
+        os.environ["FAKE_CLAUDE_STATE"] = str(self.tmp / "state2")
+        _, meta = GrokWriter(self.gcfg()).generate("research", "TASK: research\n", RESEARCH)
+        self.assertEqual([a["ok"] for a in meta["attempts"]], [False, True])
+        self.assertIn("grok error", meta["attempts"][0]["error"])
+        self.mode("auth-stderr")
+        with self.assertRaises(ClaudeUnavailable):
+            GrokWriter(self.gcfg(retries=3)).generate("script", "TASK: script\n", SCRIPT)
+
+    def test_missing_cli_and_flags(self):
+        writer, reason = get_writer(self.cfg(writer="grok", grok_bin=str(self.tmp / "nope" / "grok")))
+        self.assertIsNone(writer)
+        self.assertIn("Grok Build CLI not found", reason)
+        os.environ["EXPLAINER_WRITER"] = "grok"
+        self.assertEqual(load_config()["llm"]["writer"], "grok")
+        args = cli.argparse.ArgumentParser()
+        cli._common(args)
+        ns = args.parse_args(["topic", "--writer", "claude"])
+        self.assertEqual(load_config(sets=cli._sets(ns))["llm"]["writer"], "claude")
+
+    def test_stages_record_grok_and_keep_separate_build_folders(self):
+        claude_ctx = self.ctx(self.cfg())
+        grok_ctx = self.ctx(self.gcfg())
+        self.assertEqual(grok_ctx.common.name, "common-grok")
+        self.assertTrue(grok_ctx.variant.endswith("-grok"))
+        self.assertEqual(claude_ctx.common.name, "common")
+        from explainer.pipeline import describe
+        self.assertIn("(Grok;", describe(grok_ctx, REGISTRY["research"]))
+        self.assertIn("(Claude;", describe(claude_ctx, REGISTRY["research"]))
+        self.run_until_plan(grok_ctx)
+        metas = read_metas(grok_ctx.common)
+        self.assertEqual({m["writer"] for m in metas}, {"grok:grok-4.7"})
+        self.assertFalse(any(m["fallback"] for m in metas))
+        self.assertFalse(claude_ctx.common.exists())
+        self.assertIn("grok:grok-4.7", "\n".join(writer_report(metas)))
 
 
 class ClaudeWriterTests(FakeClaudeCase):
@@ -197,6 +271,15 @@ class WriterStageTests(FakeClaudeCase):
         self.assertFalse((common / "voice").exists())
         self.assertIn("llm.claude_bin=", err.getvalue())
         self.assertNotIn("UNAVAILABLE", err.getvalue())
+
+    def test_full_run_without_a_narrator_stops_before_any_writer_call(self):
+        os.environ["EXPLAINER_CLAUDE_BIN"] = str(self.bin)
+        build = functools.partial(Context, build_root=self.tmp / "build", out_root=self.tmp / "out")
+        with mock.patch.object(cli, "Context", build), contextlib.redirect_stderr(io.StringIO()), \
+                self.assertRaises(SystemExit) as e:
+            cli.main(["run", TOPIC])
+        self.assertIn("--voice elevenlabs:max or --voice elevenlabs:todd", str(e.exception))
+        self.assertEqual(self.calls(), [])
 
     def test_fallback_warns_loudly_and_flags_qa(self):
         cfg = self.cfg(claude_bin=str(self.tmp / "missing" / "claude"))

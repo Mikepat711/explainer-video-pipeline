@@ -8,7 +8,7 @@ from ..plan.docs import offline_research_markdown, research_markdown
 from ..plan.prompts import research_prompt
 from ..plan.schemas import RESEARCH
 from ..util import log, write_json
-from ..writer import banner, fallback_is_stale, get_writer, require_claude, write_meta, writer_identity
+from ..writer import banner, fallback_is_stale, get_writer, require_claude, write_meta, writer_identity, writer_name
 from .common import dir_fingerprint, optional_file
 
 
@@ -20,7 +20,7 @@ class Research(Stage):
 
     def inputs(self, ctx):
         return {"topic": ctx.topic, "urls": ctx.source_urls, "cfg": ctx.cfg["research"],
-                "writer": writer_identity(ctx.cfg), "web": ctx.cfg["llm"].get("web_research", True),
+                "writer": writer_identity(ctx.cfg, self.name), "web": ctx.cfg["llm"].get("web_research", True),
                 "pack": dir_fingerprint(ctx.topic_dir / "sources"),
                 "urls_file": optional_file(ctx.topic_dir / "sources.txt"),
                 "override": optional_file(ctx.pack_file("research.md")),
@@ -51,7 +51,7 @@ class Research(Stage):
             write_json(c / "research.json", {"mode": "topic-pack", "topic": ctx.topic})
             write_meta(c, self.name, "topic-pack")
             return
-        writer, reason = get_writer(ctx.cfg)
+        writer, reason = get_writer(ctx.cfg, self.name)
         if writer:
             try:
                 brief, meta = writer.generate("research", research_prompt(ctx.topic, local, ctx.brief), RESEARCH,
@@ -65,7 +65,7 @@ class Research(Stage):
             except ClaudeError as exc:
                 reason = str(exc)
         require_claude(ctx, self.name, reason)
-        banner(self.name, reason)
+        banner(self.name, reason, writer_name(ctx.cfg, self.name))
         docs = local or sources.gather(ctx.topic, ctx.topic_dir, [], ctx.cfg["research"]["fetch_wikipedia"])
         if not docs:
             raise SystemExit("no sources for the fallback writer: fix the Claude CLI, add files under "

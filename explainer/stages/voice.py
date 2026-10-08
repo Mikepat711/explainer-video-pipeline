@@ -7,8 +7,9 @@ import numpy as np
 from ..pipeline import Stage
 from ..scriptfmt import parse_script
 from ..textnorm import normalize
-from ..tts import TTSEngine, get_engine, resolve_voice
-from ..util import log, read_wav, resample_to, run, sha256_json, write_json, write_wav
+from ..tts import (ElevenLabsEngine, TTSEngine, TTSUnavailable, effective_cfg, get_engine, resolve_voice, warn_fallback,
+                   with_voice)
+from ..util import log, read_json, read_wav, resample_to, run, sha256_json, write_json, write_wav
 
 
 def trim_silence(x: np.ndarray, sr: int, thresh_db: float = -45.0, pad: float = 0.03) -> np.ndarray:
@@ -97,7 +98,27 @@ def paced_clips(cfg: dict, groups: list[list[str]], sr: int, cache: Path) -> tup
     engines with a native speed control re-synthesize once at a corrected speed, and any residual
     is closed with a gentle time-stretch (atempo), which keeps the voice's character. A preset may
     set its own target_wpm and pace_tolerance.
+
+    When the chosen engine has no key or fails at run time (quota, network), the whole narration is
+    redone with `voice.fallback`, so a video never mixes two voices; info["fallback"] says why.
     """
+    cfg, reason = effective_cfg(cfg)
+    try:
+        clips, info = _paced_clips(cfg, groups, sr, cache)
+    except TTSUnavailable as e:
+        v = resolve_voice(cfg)
+        fallback = str(v.get("fallback") or "")
+        if not fallback or fallback == v["spec"]:
+            raise SystemExit(f"voice {v['spec']!r} failed: {e}")
+        warn_fallback(v["spec"], fallback, str(e))
+        clips, info = _paced_clips(with_voice(cfg, fallback), groups, sr, cache)
+        reason = str(e)
+    if reason:
+        info["fallback"] = reason
+    return clips, info
+
+
+def _paced_clips(cfg: dict, groups: list[list[str]], sr: int, cache: Path) -> tuple[list[list[np.ndarray]], dict]:
     v, L = resolve_voice(cfg), cfg["length"]
     target, tol = float(v.get("target_wpm") or 0), float(v.get("pace_tolerance", 0.04))
     lo, hi = float(v.get("speed_adjust_min", 0.75)), float(v.get("speed_adjust_max", 1.35))
@@ -144,6 +165,13 @@ class Voice(Stage):
     extra_code = ("tts", "textnorm.py")
     owns = ("voice/*.wav",)
 
+    def still_fresh(self, ctx):
+        """Narration that fell back after a run-time ElevenLabs error is redone once the key works again."""
+        tp = ctx.common / "voice" / "timing.json"
+        info = read_json(tp) if tp.exists() else {}
+        return not (info.get("fallback") and resolve_voice(ctx.cfg)["engine"] == "elevenlabs"
+                    and info["fallback"] != "no API key" and ElevenLabsEngine.available(ctx.cfg))
+
     def inputs(self, ctx):
         L, v = ctx.cfg["length"], resolve_voice(ctx.cfg)
         return {"tts": get_engine(ctx.cfg).identity(), "sr": ctx.cfg["audio"]["sample_rate"],
@@ -171,6 +199,8 @@ class Voice(Stage):
             log(f"    removed voice tracks for scenes no longer in the script: {', '.join(p.stem for p in stale)}")
         groups = [sc["sentences"] for sc in script["scenes"]]
         clips, info = paced_clips(ctx.cfg, groups, sr, vdir / "sentences")
+        if info.get("fallback"):
+            log(f"    WARNING: narration used the fallback voice ({info['fallback']})")
         log(f"    voice {info['engine']}: {info['wpm']:.0f} wpm (target {info['target_wpm']}), "
             f"{info['speaking_wpm']:.0f} wpm while talking")
         scenes = []

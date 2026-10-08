@@ -322,6 +322,15 @@ def meter(d: Draw, a, prm, pres):
         d.text(prm["text"], 0, h / 2 + 18, 22, "muted", 1.0, "semibold", tag=f"{a.id}.label")
 
 
+def bar_decimals(vals) -> int:
+    """Enough decimals that small values (0.27 mm) don't all read as '0'."""
+    vals = [abs(float(x or 0)) for x in vals]
+    if all(x == int(x) for x in vals):
+        return 0
+    mx = max(vals + [0])
+    return 2 if mx < 1 else 1 if mx < 10 else 0
+
+
 @drawer("bars")
 def bars(d: Draw, a, prm, pres):
     w, h = float(prm.get("w") or 520), float(prm.get("h") or 300)
@@ -329,6 +338,7 @@ def bars(d: Draw, a, prm, pres):
     vals = [float(v) for v in (prm.get("values") or [])]
     n = max(1, len(labels))
     top = float(prm.get("max") or max(vals + [1]))
+    dec = bar_decimals(vals)
     colors = prm.get("colors") or []
     unit = prm.get("unit", "")
     hor = prm.get("orientation") == "horizontal"
@@ -347,7 +357,7 @@ def bars(d: Draw, a, prm, pres):
             d.fill(col)
             d.text(labels[i] if i < len(labels) else "", -w / 2 + 110, y + bh / 2, 22, "ink", 1.0, "semibold", "right",
                    tag=f"{a.id}.l{i}")
-            d.text(fmt_value(v) + (f" {unit}" if unit else ""), -w / 2 + 132 + bw, y + bh / 2, 22, "muted", 1.0,
+            d.text(fmt_value(v, dec) + (f" {unit}" if unit else ""), -w / 2 + 132 + bw, y + bh / 2, 22, "muted", 1.0,
                    "semibold", "left", tag=f"{a.id}.v{i}")
         else:
             slot = w / n
@@ -358,7 +368,7 @@ def bars(d: Draw, a, prm, pres):
             d.fill(col)
             d.text(labels[i] if i < len(labels) else "", x + bw / 2, h / 2 + 24, 22, "ink", 1.0, "semibold",
                    tag=f"{a.id}.l{i}")
-            d.text(fmt_value(v) + (f" {unit}" if unit else ""), x + bw / 2, h / 2 - bh - 20, 22, "muted", 1.0,
+            d.text(fmt_value(v, dec) + (f" {unit}" if unit else ""), x + bw / 2, h / 2 - bh - 20, 22, "muted", 1.0,
                    "semibold", tag=f"{a.id}.v{i}")
 
 

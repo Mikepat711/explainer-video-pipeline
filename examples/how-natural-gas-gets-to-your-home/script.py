@@ -1,0 +1,92 @@
+# Narration, split into scenes. Each sentence: (caption_text, tts_text or None)
+# tts_text is used where the spoken form differs from what we show on screen.
+SCENES = [
+ ("hook", "Behind the flame", [
+   ("Turn the knob on a gas stove, and a blue flame appears.", None),
+   ("Behind it is a hidden system of pipes that spans the continent.", None),
+   ("Let's follow the gas home.", None),
+ ]),
+ ("source", "Where gas comes from", [
+   ("Natural gas starts with life.", None),
+   ("Millions of years ago, tiny plants and animals were buried under mud and rock.", None),
+   ("Heat and pressure slowly turned all of it into gas.", None),
+   ("It's trapped in rock, often a mile or more down.", None),
+   ("Some is locked in a tight rock called shale.", None),
+   ("To free it, crews may use fracking: pumping water and sand down to crack the rock.", "To free it, crews may use fracking. Pumping water and sand down, to crack the rock."),
+   ("A well brings the gas up to the wellhead, a set of valves at the surface.", None),
+ ]),
+ ("gathering", "Gathering lines", [
+   ("A gas field can have many wells.", None),
+   ("Small pipes called gathering lines connect them, like streams joining a river.", None),
+   ("They carry the raw gas to a processing plant.", None),
+ ]),
+ ("processing", "The processing plant", [
+   ("The plant strips out water and impurities.", None),
+   ("It also removes propane and butane, which are sold separately.", None),
+   ("What's left is mostly methane.", None),
+   ("And methane has no smell at all.", None),
+ ]),
+ ("transmission", "Transmission pipelines", [
+   ("Next comes a transmission pipeline: a big steel pipe, up to about four feet wide, buried underground.", "Next comes a transmission pipeline. A big steel pipe, up to about four feet wide, buried underground."),
+   ("These highways of gas run for hundreds, even thousands of miles.", None),
+   ("The gas inside is squeezed to several hundred, up to about 1,500 pounds per square inch.", "The gas inside is squeezed to several hundred, up to about fifteen hundred pounds per square inch."),
+   ("A car tire holds about 35.", "A car tire holds about thirty five."),
+ ]),
+ ("compressors", "Keeping the gas moving", [
+   ("Friction against the pipe walls slowly drains that pressure.", None),
+   ("So every 40 to 100 miles or so, a compressor station squeezes it back up.", "So every forty to a hundred miles or so, a compressor station squeezes it back up."),
+   ("The gas moves at about the speed of a bicycle.", None),
+   ("Yellow posts along roads and fields mark roughly where a line runs,", None),
+   ("and long, cleared strips of land keep the path open for repairs.", None),
+ ]),
+ ("storage", "Saving it for winter", [
+   ("Homes use far more gas in winter.", None),
+   ("So in summer, extra gas is stored deep underground,", None),
+   ("in old, emptied gas fields, or in huge salt caverns.", None),
+   ("In winter, it flows back out.", None),
+ ]),
+ ("citygate", "The city gate", [
+   ("Near a town, the pipeline reaches a city gate, where your local gas company takes over.", None),
+   ("Regulators make the first big drop in pressure.", None),
+   ("Gas gets cold as it expands, so it's often warmed first.", None),
+   ("It's measured, and a smelly chemical called mercaptan is added:", "It's measured, and a smelly chemical called mercaptan is added."),
+   ("the rotten-egg smell, so a leak can't hide.", "The rotten-egg smell, so a leak can't hide."),
+ ]),
+ ("mains", "Under your street", [
+   ("Then gas spreads out through distribution mains under the streets.", None),
+   ("Newer ones are often yellow plastic, called polyethylene.", None),
+   ("Older ones may be steel, or even cast iron.", None),
+   ("District regulator stations step the pressure down again,", None),
+   ("often to about what's in a car tire, or much less.", None),
+ ]),
+ ("service", "The service line", [
+   ("A small service line branches off the main to your house.", None),
+   ("It's often plastic, about as wide as a garden hose,", None),
+   ("and runs under the yard, often just a foot or two down.", None),
+   ("So always call 811 before you dig.", "So always call eight one one, before you dig."),
+   ("It's free, and they'll mark the lines.", None),
+ ]),
+ ("house", "At your house", [
+   ("At the house, the line rises to the gas meter.", None),
+   ("First, a shutoff valve.", None),
+   ("Then the regulator: the bell-shaped part.", "Then the regulator. The bell-shaped part."),
+   ("It drops the pressure to about a quarter of a pound per square inch,", None),
+   ("less push than gently blowing through a straw.", None),
+   ("The meter counts how much gas you use.", None),
+   ("Inside, pipes branch to the furnace, water heater, stove, and dryer,", None),
+   ("each with its own shutoff valve.", None),
+ ]),
+ ("safety", "If you smell gas", [
+   ("If you ever smell rotten eggs, leave first.", None),
+   ("Don't flip switches or light anything.", None),
+   ("Once you're outside, call the gas company or 911.", "Once you're outside, call the gas company, or nine one one."),
+ ]),
+ ("close", "From the well to the flame", [
+   ("So step back, and look at the whole path.", None),
+   ("From rock a mile down, across hundreds of miles of steel,", None),
+   ("through the city gate, under your street, and into your home,", None),
+   ("the pressure steps down from about 1,500 pounds to about a quarter of a pound.", "the pressure steps down, from about fifteen hundred pounds, to about a quarter of a pound."),
+   ("More than two million miles of gas pipe, all hidden,", None),
+   ("so one small blue flame can appear.", None),
+ ]),
+]
