@@ -10,7 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 from ..gfx.theme import Theme
 from ..pipeline import Stage
 from ..util import log, read_json, run, write_json
-from ..writer import banner, read_metas
+from ..writer import banner, read_metas, writer_name
 
 
 def loudness(path) -> dict:
@@ -139,7 +139,8 @@ class QA(Stage):
             if not ok:
                 log(f"      failed: {k}")
         if fallbacks:
-            banner(", ".join(m["stage"] for m in fallbacks), fallbacks[0].get("reason") or "see qa.md")
+            banner(", ".join(m["stage"] for m in fallbacks), fallbacks[0].get("reason") or "see qa.md",
+                   writer_name(ctx.cfg))
 
     def contact_sheet(self, ctx, frames):
         thumbs = [Image.open(ctx.out_dir / f["file"]).convert("RGB") for f in frames]

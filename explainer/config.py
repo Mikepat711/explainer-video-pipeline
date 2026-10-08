@@ -31,10 +31,18 @@ def _coerce(value: str):
 LOCAL_KEYS = {  # ~/.config/explainer/config key -> (config path, type)
     "EXPLAINER_VOICE": ("voice.use", str),
     "EXPLAINER_LLM": ("llm.writer", str),
+    "EXPLAINER_WRITER": ("llm.writer", str),
+    "EXPLAINER_GRIND": ("llm.grind", str),
     "EXPLAINER_LLM_MODEL": ("llm.model", str),
     "EXPLAINER_LLM_TIMEOUT": ("llm.timeout", float),
     "EXPLAINER_LLM_RETRIES": ("llm.retries", int),
     "EXPLAINER_CLAUDE_BIN": ("llm.claude_bin", str),
+    "EXPLAINER_GROK_BIN": ("llm.grok_bin", str),
+    "EXPLAINER_GROK_MODEL": ("llm.grok_model", str),
+    "EXPLAINER_DELIVER_DIR": ("produce.deliver_dir", str),
+    "EXPLAINER_BUNDLES_DIR": ("produce.bundles_dir", str),
+    "EXPLAINER_WHISPER_MODEL": ("captions.whisper_model", str),
+    "EXPLAINER_FONT_DIR": ("produce.font_dir", str),
 }
 
 

@@ -31,11 +31,20 @@ style:
   crossfade: 0.9          # dissolve between scenes (s)
 
 voice:
-  use: kokoro:af_heart    # <- THE NARRATOR VOICE: any key under `presets` below (or engine:voice).
+  use: ""                 # <- THE NARRATOR VOICE. Empty = no default: every run must pick one with
+                          #    --voice (e.g. --voice elevenlabs:max), or the run stops before any work.
+                          #    Any key under `presets` below (or engine:voice). Per machine: EXPLAINER_VOICE=...
+  choices: [elevenlabs:max, elevenlabs:todd]  # the current narrators, listed when no voice was chosen
                           #    Per machine: EXPLAINER_VOICE=kokoro:bm_george in ~/.config/explainer/config
+  fallback: kokoro:af_heart  # used, with a warning, when the narrator's engine has no API key or fails (quota, network)
   target_wpm: 165         # voices are paced to this, counted over speech plus pauses between sentences (0 = keep the preset's natural speed)
   pace_tolerance: 0.04    # the preset's own speed is kept while the result is within ±4% of the target
   presets:                # per-voice settings (a preset may set its own target_wpm); compare with `make voices`
+    elevenlabs: {speed: 0.85, target_wpm: 0}  # every ElevenLabs voice: calm pace (~150-170 wpm), never re-paced (re-pacing re-bills)
+    elevenlabs:arabella: {speed: 0.95}  # reads slower than most, ~153 wpm at 0.95
+    elevenlabs:max: {speed: 1.08, stability: 0.4, style: 0.2}   # friendly, articulate teacher; ~150 wpm
+    elevenlabs:todd: {speed: 0.8, stability: 0.4, style: 0.2}   # upbeat YouTube educator; fast reader, ~159 wpm at 0.8
+    elevenlabs:marie: {speed: 1.1}      # reads slowly (~124 wpm at 0.85), ~156 wpm at 1.1
     kokoro:af_heart: {speed: 0.85, target_wpm: 0}  # American female, warm; natural pace (~155 wpm while talking), never re-paced or time-stretched
     kokoro:af_bella: {speed: 0.88}     # American female, bright and clear
     kokoro:am_michael: {speed: 0.96}   # American male, steady and neutral
@@ -43,6 +52,27 @@ voice:
     kokoro:bm_fable: {speed: 0.85}     # British male, younger and lively
     chatterbox: {exaggeration: 0.4, cfg_weight: 0.3}  # expressive male; `make setup-chatterbox`; time-stretched to pace
     parler:Jon: {}                     # Parler-TTS mini, male; `make setup-parler`; time-stretched to pace
+  elevenlabs:              # ElevenLabs API (key: ELEVENLABS_API_KEY or ~/.config/explainer/elevenlabs.env)
+    model: eleven_multilingual_v2
+    output_format: mp3_44100_128
+    stability: 0.5          # higher = steadier and flatter, lower = more expressive
+    similarity_boost: 0.75
+    style: 0.0              # 0 keeps a calm, neutral read
+    speaker_boost: true
+    seed: 7                 # repeatable takes
+    timeout: 60             # seconds per request
+    retries: 2              # extra attempts after rate limits and server errors (quota errors fall back at once)
+    voices:                 # names usable as elevenlabs:<name>; any ElevenLabs voice id works too
+      arabella: Z3R5wn05IrDiVCyEkUrK # mysterious and emotive female narrator
+      max: Gfpl8Yo74Is0W6cPUWWT      # friendly, articulate American male e-learning/explainer voice
+      todd: g14YnDYCsy3k7XLlcKlO     # clear, engaging, upbeat young American male educator
+      marie: wsL2AB1kHVzgox3WvQP2    # professional and warm American female, educational
+      river: SAz9YHcvj6GT2YYXdXww    # calm, neutral American narrator
+      brian: nPczCjzI2devNBz1zQrb    # deep, resonant American male
+      matilda: XrExE9yKIg1WjnnlVkGX  # warm American female
+      eric: cjVigY5qzO86Huf0OWal     # smooth American male
+      alice: Xb7hH8MSUJpSbSDYk0k2    # clear British female
+      george: JBFqnCBsd6RMkjVDRZzb   # warm British male storyteller
   kokoro_model: kokoro-v1.0.onnx  # or kokoro-v1.0.int8.onnx (smaller, slightly less clean)
   piper_voice: en_US-lessac-high
   espeak_voice: en-us
@@ -71,21 +101,41 @@ audio:
   duck_db: -10.0          # extra attenuation under the voice
   sfx: true
   sfx_gain_db: -15.0
+  samples: []             # recorded/generated sounds on the SFX track, set per topic (see explainer/audio/samples.py):
+                          #   - {file: .cache/sfx/click.mp3, scene: panel, at: "s3+0.2", gain_db: 0}
 
 captions:
   burn_in: true
   max_chars_16x9: 44
   max_chars_9x16: 26
   max_lines: 2
+  word_timing: auto       # auto: time cues to the spoken words with local whisper.cpp (whisper-cli + model) when
+                          #   available, else estimate within each sentence; off: always estimate
+  whisper_model: ""       # empty = $EXPLAINER_WHISPER_MODEL or .cache/whisper/ggml-base.en.bin
+  whisper_bin: ""         # empty = whisper-cli on PATH
+  highlight_words: false  # with word timing: upcoming words slightly dimmed, each lights as it is spoken
 
-llm:                      # research, script and visual plan are written by Claude Code (`claude -p`)
-  writer: claude          # claude | off (off = the last-resort offline fallback)
+llm:                      # research, script and visual plan are written by a coding-agent CLI
+  writer: claude          # claude | grok | off (off = the last-resort offline fallback); per run: --writer grok;
+                          #   per machine: EXPLAINER_WRITER=grok. Non-Claude writers build into common-<writer>/ and <variant>-<writer>/
   model: opus             # `claude --model` alias; per machine: EXPLAINER_LLM_MODEL=opus in ~/.config/explainer/config
   claude_bin: ""          # empty = `claude` on PATH (or the standard ~/.local/bin install); EXPLAINER_CLAUDE_BIN
   timeout: 900            # seconds per call before it is killed (the research call browses the web)
   retries: 2              # extra attempts after a failed or invalid reply (validation errors are fed back)
   web_research: true      # let the research call use WebSearch/WebFetch
   extra_args: []          # appended to every `claude` call
+  grok_model: grok-4.7    # `grok -m` model id (always run with --permission-mode auto); EXPLAINER_GROK_MODEL
+  grok_bin: ""            # empty = `grok` on PATH, else ~/.grok/bin/grok; EXPLAINER_GROK_BIN
+  grok_extra_args: []     # appended to every `grok` call
+  grok_timeout: 2400      # Grok reasons long (a plan took ~30 min in testing); overrides `timeout` for Grok calls
+  grok_effort: ""         # --reasoning-effort for Grok writer calls: "" (Grok's default) | low | medium | high
+  grind: "off"            # who runs the layout-fix stage (fixes text overlaps in the plan without redesigning it):
+                          #   off | grok | claude; per run: --grind grok; per machine: EXPLAINER_GRIND=grok
+  grind_effort: medium    # Grok reasoning effort for grind calls (small, mechanical edits)
+  grind_timeout: 1200     # seconds per grind call
+  grind_retries: 2        # extra fix rounds per scene; each round's remaining issues are fed back
+  grind_parallel: 4       # scenes fixed at the same time
+  stage_writers: {}       # per-stage override, e.g. {research: claude, script: claude, plan: claude, layout: grok}
 
 research:
   fetch_wikipedia: true   # fallback writer only: used when Claude is unavailable and a topic has no local sources
@@ -96,3 +146,10 @@ render:
                           # plan | templates force one renderer
   workers: 3              # parallel scene renders
   scene_timeout: 900      # seconds per scene before a hung render worker fails the stage
+
+produce:                  # bundle production path (`explainer build`)
+  share_max_mb: 25        # size cap for the share copy
+  deliver_dir: ""         # copy the finished MP4 here; per machine: EXPLAINER_DELIVER_DIR
+  bundles_dir: "~/explainer-bundles"  # where incoming bundles land
+  asr: auto               # auto = whisper-cli when installed; on | off
+  workers: 0              # 0 = use render.workers

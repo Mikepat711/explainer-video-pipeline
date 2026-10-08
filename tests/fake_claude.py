@@ -1,4 +1,5 @@
-"""Stand-in for the Claude Code CLI (`claude -p <prompt> ... --output-format json`).
+"""Stand-in for the Claude Code CLI (`claude -p <prompt> ... --output-format json`) and, when called
+with `--permission-mode` (as the Grok writer does), for the Grok Build CLI and its envelope.
 
 Replies with the fixture for the prompt's `TASK:` line, wrapped in the CLI's JSON envelope.
 Behaviour is set by environment variables:
@@ -19,7 +20,15 @@ from pathlib import Path
 FIXTURES = Path(os.environ.get("FAKE_CLAUDE_FIXTURES") or Path(__file__).resolve().parent / "fixtures" / "claude")
 
 
+GROK = "--permission-mode" in sys.argv
+
+
 def envelope(result: str, is_error: bool = False, subtype: str = "success") -> str:
+    if GROK:
+        if is_error:
+            return json.dumps({"type": "error", "message": result})
+        return json.dumps({"text": result, "stopReason": "end_turn", "sessionId": "fake", "total_cost_usd": 0.02},
+                          indent=2)
     return json.dumps({"type": "result", "subtype": subtype, "is_error": is_error, "duration_ms": 1234,
                        "num_turns": 1, "result": result, "session_id": "fake", "total_cost_usd": 0.01})
 
@@ -53,6 +62,14 @@ def main() -> int:
     mode = os.environ.get("FAKE_CLAUDE_MODE", "ok") if not tasks or task in tasks else "ok"
     fixture = FIXTURES / f"{task}.json"
     good = fixture.read_text() if fixture.exists() else "{}"
+    if task == "layout":  # echo the scene back, optionally spread apart (FAKE_LAYOUT_SPREAD) or renamed
+        scene = json.loads(prompt.split("Scene JSON:\n", 1)[1].split("\n", 1)[0])
+        if os.environ.get("FAKE_LAYOUT_SPREAD"):
+            for i, a in enumerate(scene.get("actors", [])):
+                a.update(at=[300 + 450 * i, 200 + 150 * i], scale=0.6)
+        if os.environ.get("FAKE_LAYOUT_RENAME"):
+            scene["actors"][0]["id"] += "_renamed"
+        good = json.dumps({"scene": scene, "changes": ["fake change"]})
 
     if mode == "timeout":
         time.sleep(60)

@@ -44,14 +44,32 @@ class Context:
         return p if p.exists() and not self.fresh else None
 
     @property
+    def writer_tag(self) -> str:
+        """'' for Claude (the default) and the offline fallback; e.g. 'grok' otherwise, so each writer keeps
+        its own research/script/plan and finished video and switching writers never overwrites the other's."""
+        w = str((self.cfg.get("llm") or {}).get("writer") or "claude").lower()
+        return "" if w in ("claude", "off", "offline", "none", "false") else slugify(w)
+
+    @property
+    def grind_tag(self) -> str:
+        """e.g. 'grokfix' when a grind writer (llm.grind) fixes the plan's layout, so its video sits apart."""
+        from .writer import stage_writer_name
+        g = stage_writer_name(self.cfg, "layout")
+        return "" if g in ("off", "offline", "none", "false", "") else f"{slugify(g)}fix"
+
+    @property
     def common(self) -> Path:
-        return self.build_root / self.slug / "common"
+        return self.build_root / self.slug / ("common" + (f"-{self.writer_tag}" if self.writer_tag else ""))
 
     @property
     def variant(self) -> str:
         v = aspect_tag(self.cfg)
         if self.tag:
             v += f"-{slugify(self.tag)}"
+        if self.writer_tag:
+            v += f"-{self.writer_tag}"
+        if self.grind_tag:
+            v += f"-{self.grind_tag}"
         return v
 
     @property
@@ -162,6 +180,21 @@ def clear_stale_dependents(ctx: Context, stage: Stage, registry: dict[str, Stage
             log(f"           cleared stale {dep.name} output" + (f": {', '.join(p.name for p in gone)}" if gone else ""))
 
 
+WRITER_LABELS = {"grok": "Grok", "claude": "Claude", "off": "off", "offline": "offline writer"}
+
+
+def describe(ctx: Context, stage: Stage) -> str:
+    """The stage description, naming the active writer instead of Claude when another one is selected.
+    (Kept here, outside the stage modules, so the label never changes a stage's code fingerprint.)"""
+    from .writer import stage_writer_name
+    w = stage_writer_name(ctx.cfg, stage.name)
+    if "(grind writer)" in stage.description:
+        return stage.description.replace("grind writer", WRITER_LABELS.get(w, w.capitalize()))
+    if w == "claude" or "Claude" not in stage.description:
+        return stage.description
+    return stage.description.replace("Claude", WRITER_LABELS.get(w, w))
+
+
 def execute(ctx: Context, stage: Stage, registry: dict[str, Stage], force: bool = False) -> bool:
     """Run one stage if stale (or forced). Returns True if it actually ran."""
     if not force and is_fresh(ctx, stage, registry):
@@ -171,7 +204,7 @@ def execute(ctx: Context, stage: Stage, registry: dict[str, Stage], force: bool 
     previous = read_json(sp).get("result_hash") if sp.exists() else None
     fp = fingerprint(ctx, stage, registry)
     ctx.dir_for(stage).mkdir(parents=True, exist_ok=True)
-    log(f"  [run]    {stage.name} — {stage.description}")
+    log(f"  [run]    {stage.name} — {describe(ctx, stage)}")
     t0 = time.time()
     stage.run(ctx)
     outs = stage.outputs(ctx)

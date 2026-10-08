@@ -9,7 +9,7 @@ from ..util import LIBASS_HELP, ffmpeg_with_libass, log, read_json, run
 
 
 XFADE = {"fade": "fade", "slide_left": "slideleft", "slide_up": "slideup", "zoom_in": "zoomin",
-         "zoom_out": "fadeblack"}
+         "zoom_out": "circleopen"}  # never dip to black: QA flags it as a black/blank segment
 
 
 def transition(scene: dict, crossfade: float, fps: int) -> tuple[str, float]:

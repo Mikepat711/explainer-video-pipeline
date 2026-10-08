@@ -11,12 +11,17 @@ make video TOPIC="how GPS works"
 
 Research, the script and a lesson-specific visual plan are written by Claude (Opus by default) through
 the [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI you are already signed in to; the
-repo holds no API keys (see [Script writer](#script-writer-claude-code)). The renderer then draws that
-plan with purpose-built mechanism animations (spinning rotors, power flows, gauges, relays, transformers)
-timed to the narration, rather than filling in slide templates (see [Visual plan renderer](#visual-plan-renderer)).
-Everything else runs locally.
+repo holds no API keys (see [Script writer](#script-writer-claude-code-or-grok-build)). The renderer then
+draws that plan with purpose-built mechanism animations (spinning rotors, power flows, gauges, relays,
+transformers) timed to the narration, rather than filling in slide templates (see
+[Visual plan renderer](#visual-plan-renderer)). Everything else runs locally.
 Narration uses [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M), an 82M-parameter open-weight neural
-voice run through ONNX Runtime, with Chatterbox, Parler, Piper and espeak-ng as alternatives.
+voice run through ONNX Runtime, with [ElevenLabs](https://elevenlabs.io) (Max / Todd and any other
+voice you name), Chatterbox, Parler, Piper and espeak-ng as alternatives.
+
+You can also pick Grok Build as the writer, split stages across Claude and Grok, and — when you or an
+assistant already wrote the scene code — build from a **project bundle** instead of asking a writer to
+invent the lesson (see [Project bundles](#project-bundles)).
 
 A lesson covers about 350 words of narration, read at a conversational ~160 words per minute with
 breathing pauses between sentences, so finished videos run about 2.5 to 3 minutes.
@@ -53,11 +58,12 @@ breathing pauses between sentences, so finished videos run about 2.5 to 3 minute
    make setup PYTHON=python3.12
    ```
 
-5. Make a video (the first run downloads the Kokoro voice model, about 350 MB, into `.cache/voices/`):
+5. Make a video (the first run downloads the Kokoro voice model, about 350 MB, into `.cache/voices/`).
+   There is no default narrator: pass `--voice` (or set `EXPLAINER_VOICE`) so the run knows who should speak.
 
    ```bash
-   make plan TOPIC="how the electrical grid works"    # optional: research, script and visual plan only
-   make video TOPIC="how the electrical grid works"
+   make plan TOPIC="how the electrical grid works" ARGS="--voice kokoro:af_heart"
+   make video TOPIC="how the electrical grid works" ARGS="--voice kokoro:af_heart"
    open out/how-the-electrical-grid-works/16x9/how-the-electrical-grid-works.mp4
    ```
 
@@ -67,8 +73,13 @@ The narrator is one line in `config.yaml`:
 
 ```yaml
 voice:
-  use: kokoro:af_heart    # <- THE NARRATOR VOICE
+  use: ""                   # <- THE NARRATOR VOICE: empty = choose per run with --voice (no default)
+  choices: [elevenlabs:max, elevenlabs:todd]  # listed when a run has no --voice
+  fallback: kokoro:af_heart  # used, with a warning, if ElevenLabs has no key or fails
 ```
+
+There is no default narrator: `explainer run "topic" --voice elevenlabs:todd` picks one per video, and a run
+without `--voice` (and without `EXPLAINER_VOICE`) stops before any writer call, listing `voice.choices`.
 
 To use a different voice on one machine without touching the repo, add one line to
 `~/.config/explainer/config`:
@@ -77,8 +88,8 @@ To use a different voice on one machine without touching the repo, add one line 
 EXPLAINER_VOICE=kokoro:bm_george
 ```
 
-For a single run: `ARGS="--set voice.use=kokoro:bm_fable"`. The default narrator, af_heart, speaks at
-its natural pace: preset speed 0.85 (about 155 words per minute while talking) with `target_wpm: 0`, so it
+For a single run: `--voice elevenlabs:river` (or `ARGS="--voice kokoro:bm_fable"` with make). The Kokoro
+narrator, af_heart, speaks at its natural pace: preset speed 0.85 (about 155 words per minute while talking) with `target_wpm: 0`, so it
 is never re-synthesized faster or time-stretched to hit a length. Squeezing speech to a words-per-minute
 target that counts the pauses made narration sound rushed: the more pauses a script had, the faster the
 words were pushed. Scripts are written in short sentences instead, and each sentence break is a pause.
@@ -89,7 +100,12 @@ time-stretch closes any gap that remains. Set a preset's `target_wpm: 0` to keep
 
 | `voice.use` | Voice | Notes |
 |---|---|---|
-| `kokoro:af_heart` | American female, warm and soft | Default; speed 0.85, natural pace (~155 wpm while talking) |
+| `elevenlabs:arabella` | ElevenLabs, mysterious and emotive female narrator | Speed 0.95 (~153 wpm) |
+| `elevenlabs:max` | ElevenLabs, friendly, articulate American male teacher | Speed 1.08, stability 0.4, style 0.2 (~150 wpm) |
+| `elevenlabs:todd` | ElevenLabs, clear, upbeat young American male educator | Speed 0.8, stability 0.4, style 0.2 (~159 wpm; a fast reader) |
+| `elevenlabs:marie` | ElevenLabs, professional and warm American female, educational | Speed 1.1 (~156 wpm; slow at 0.85) |
+| `elevenlabs:<name or id>` | Any ElevenLabs voice | Names in `voice.elevenlabs.voices` (any capitalisation): river, brian, matilda, eric, alice, george; speed 0.85. An unknown name stops the run with the list of names |
+| `kokoro:af_heart` | American female, warm and soft | Fallback; speed 0.85, natural pace (~155 wpm while talking) |
 | `kokoro:af_bella` | American female, bright and clear | Speed 0.88 |
 | `kokoro:am_michael` | American male, steady and neutral | Speed 0.96 |
 | `kokoro:bm_george` | British male, mature documentary narrator | Speed 0.96 |
@@ -104,6 +120,42 @@ available. Chatterbox and Parler run PyTorch in their own virtualenvs (`.venv-ch
 `.venv-parler`) so their pinned versions never clash with the main one. On Apple Silicon they use the
 GPU (MPS) when it works and fall back to the CPU.
 
+### ElevenLabs
+
+1. Create an API key in ElevenLabs (Developers > API Keys). Text-to-speech access is all it needs.
+2. Save it on the machine that renders, outside the repo, readable only by you:
+
+   ```bash
+   mkdir -p ~/.config/explainer
+   printf 'ELEVENLABS_API_KEY=%s\n' 'paste-your-key-here' > ~/.config/explainer/elevenlabs.env
+   chmod 600 ~/.config/explainer/elevenlabs.env
+   ```
+
+   An `ELEVENLABS_API_KEY` environment variable works too and wins over the file;
+   `EXPLAINER_ELEVENLABS_KEY_FILE` points at a key file somewhere else. The key is only sent to the
+   ElevenLabs API; it is never logged or written to build files.
+3. Pick a voice: `make voices VOICES=elevenlabs:max,elevenlabs:todd,elevenlabs:river,elevenlabs:brian`, then set
+   `voice.use` (or `EXPLAINER_VOICE` in the machine-local config).
+
+Settings live under `voice.elevenlabs` in `config.yaml`: `model` (default `eleven_multilingual_v2`),
+`output_format`, `stability`, `similarity_boost`, `style`, `speaker_boost`, `seed`, `timeout`, `retries`,
+and `voices`, a name-to-id map so `elevenlabs:<name>` works (any raw voice id works as well). The
+`elevenlabs` preset sets the speaking `speed` (0.7 to 1.2; 0.85 gives a calm ~150-165 wpm) and
+`target_wpm: 0`, so narration is never re-synthesized to hit a pace, which would bill twice. A preset for
+one voice overrides these for that voice: `elevenlabs:arabella: {speed: 0.95}` does, and any
+voice can get its own (e.g. `elevenlabs:brian: {speed: 0.9, stability: 0.6}`).
+
+Each sentence is synthesized on its own, as with every engine, and the pauses between sentences are real
+silence added by the voice stage, so caption and animation timing stay exact. Replies are cached in the
+voice cache (`.cache/voices/elevenlabs/`, or under `EXPLAINER_VOICE_DIR`) by text, voice and settings:
+re-renders, cleaned builds and other topics never pay for a sentence twice. The voice stage logs how many
+characters each run billed.
+
+If there is no key, narration uses `voice.fallback` (Kokoro af_heart) with a warning. If ElevenLabs fails
+mid-run (quota used up, invalid key, network), the whole narration is redone with the fallback, so a video
+never mixes two voices; `timing.json` records the reason under `fallback`, and the next run tries
+ElevenLabs again once the key works. Set `voice.fallback: ""` to make an ElevenLabs failure stop the run.
+
 ```bash
 make voices                      # every preset reads the same paragraph -> out/voices/voice-*.mp3
 make voices ARGS=--list          # presets, what is installed, and every Kokoro voice id
@@ -114,9 +166,10 @@ Numbers, units, years and common acronyms are spelled out before synthesis ("400
 hundred thousand volts"). Add your own spoken forms under `voice.pronounce`. Each sentence is cached per
 voice, so switching voices only re-synthesizes the narration.
 
-## Script writer (Claude Code)
+## Script writer (Claude Code or Grok Build)
 
-Three stages write the lesson, each a headless call to the Claude Code CLI:
+Three stages write the lesson, each a headless call to a coding-agent CLI: Claude Code by default, or
+Grok Build (see [Choosing the writer](#choosing-the-writer-claude-or-grok)):
 
 | Stage | Output (`build/<slug>/common/`) | What Claude writes |
 |---|---|---|
@@ -155,6 +208,54 @@ Run only these stages with `make plan TOPIC="..."` (or `python -m explainer run 
 - A topic pack's hand-authored `research.md`, `script.md` or `plan.json` wins over Claude unless you pass
   `--fresh`, which sets those files aside so Claude writes new ones. A topic without pinned files is
   unaffected by `--fresh`, so nothing re-runs.
+
+### Choosing the writer (Claude or Grok)
+
+`llm.writer` picks who writes the research, script and visual plan: `claude` (default), `grok`, or `off`
+(the offline fallback only).
+
+```bash
+explainer run --writer grok "how GPS works"             # one run
+echo 'EXPLAINER_WRITER=grok' >> ~/.config/explainer/config   # this machine's default
+```
+
+Both writers get the identical prompts, schemas, checks and retries; only the command line and the
+reply envelope differ. Grok runs as
+`grok -p <prompt> -m grok-4.7 --permission-mode auto --output-format json --no-subagents`, with stdin
+closed, an empty working directory, shell, file-edit, subagent, connector and media tools disabled, and
+web tools allowed only for the research call. A short `--rules` note tells Grok to return the document as its
+reply instead of writing and validating files (the task prompt itself is unchanged). Settings: `llm.grok_model` (`EXPLAINER_GROK_MODEL`, default
+`grok-4.7`), `llm.grok_bin` (`EXPLAINER_GROK_BIN`; default `grok` on PATH, then `~/.grok/bin/grok`) and
+`llm.grok_extra_args`. `llm.timeout`, `llm.retries` and `llm.web_research` apply to both.
+
+A non-Claude writer builds into its own folders, `build/<slug>/common-grok/` and
+`out/<slug>/<variant>-grok/` (e.g. `16x9-grok`), so the same topic can be rendered by both writers and
+compared without either overwriting the other's work. Which writer wrote each stage is recorded in
+`*.meta.json` (`"writer": "grok:grok-4.7"`, with attempts, duration and cost) and at the top of `qa.md`.
+
+### Splitting the work: per-stage writers and the grind writer
+
+Every stage after the plan is deterministic (no LLM writes code there), so the place for a second model is
+a **layout-fix stage** (`layout`, between `voice` and `timeline`). It checks the plan with the renderer's own
+layout probe at the real narration timing, sends each scene with text overlaps (or text off-frame or under
+the captions) to the *grind writer*, re-probes every reply and feeds the remaining issues back for another
+round. The fixer may only move, resize, re-anchor or re-time things and add `exit`/`move` beats; actor ids and
+kinds, every on-screen word, the beat order and the scene's teaching fields are locked and verified, and a
+fix is kept only if it lowers the issue count (also for later scenes that inherit it). The result is
+`plan.fixed.json`, which the timeline renders; a plain copy when the grind writer is off.
+
+```sh
+explainer run --writer claude --grind grok "how wet wipes are made"   # Claude writes and designs, Grok fixes layout
+```
+
+`llm.grind` (`--grind`, `EXPLAINER_GRIND`) is `off` by default. `llm.stage_writers` overrides any stage, e.g.
+`{research: claude, script: grok, layout: grok}`. Grind calls use `llm.grind_effort` (Grok
+`--reasoning-effort`, default `medium`), `grind_timeout`, `grind_retries` (extra fix rounds) and
+`grind_parallel` (scenes at once). Grok writer calls in general use `llm.grok_timeout` (default 2400 s) and
+`llm.grok_effort`. With a grind writer on, the variant folder is tagged (e.g. `16x9-grokfix`) while
+`build/<slug>/common/` keeps sharing Claude's research/script/plan. `layout.md` lists every change and
+`layout.meta.json` records issues before and after, rounds, time and cost per scene; `qa.md` shows
+`layout = grok:grok-4.7@medium`.
 
 ### Briefs: required topics and notes
 
@@ -225,22 +326,61 @@ template renderer. `render.engine` forces one or the other.
 a hand-sized mechanism (gears, chain, a parallelogram linkage, a sprung cage) drawn from the same
 vocabulary as the grid lesson but with no actors, style or staging in common with it.
 
+## Project bundles
+
+When you or an assistant already wrote the script and scene-drawing code, skip the writer and produce
+the video from a **project bundle**: a small directory (or a `.tgz` of one) with `manifest.yaml`,
+`script.py`, `scenes.py` and any project-specific art. Shared drawing helpers live in
+`explainer/draw/` (`lib`, `art`, `art_pro`) so bundles stay small. Media never travels with the
+bundle — the machine that renders runs TTS, draws frames, mixes audio and writes the MP4 locally.
+
+The example is the natural-gas lesson:
+
+[`examples/how-natural-gas-gets-to-your-home/`](examples/how-natural-gas-gets-to-your-home/)
+
+```bash
+make setup-bundle                          # skia-python, scipy, soundfile, pyloudnorm
+.venv/bin/explainer build examples/how-natural-gas-gets-to-your-home
+# -> out/how-natural-gas-gets-to-your-home/16x9/how-natural-gas-gets-to-your-home.mp4
+
+.venv/bin/explainer pack examples/how-natural-gas-gets-to-your-home   # tar, code only
+.venv/bin/explainer build examples/how-natural-gas-gets-to-your-home --voice elevenlabs:todd
+.venv/bin/explainer build <bundle> --scene hook            # one scene
+.venv/bin/explainer build <bundle> --still hook:2.5        # PNG at 2.5s
+.venv/bin/explainer build <bundle> --detached              # log + JSON {pid, log, status}
+.venv/bin/explainer status <bundle> --json                 # poll stages and output paths
+```
+
+Stages: **voice** → **render** (skia, parallel workers, libx264) → **music**
+(bed + SFX, mix to about −16 LUFS / true peak under −1 dBTP) → **assemble** →
+**share** (under 25 MB) → **qa** (loudness, blackdetect, contact sheet, optional
+whisper.cpp ASR) → **deliver** (copy the MP4 to `EXPLAINER_DELIVER_DIR` when set).
+
+Optional extras: `whisper-cli` plus a ggml model (`EXPLAINER_WHISPER_MODEL`) for
+word-timed SFX cues and the ASR check. Poppins is vendored under
+`explainer/fonts/Poppins/` (OFL). The schema is in [docs/bundle.md](docs/bundle.md).
+
 ## Machine-local settings
 
 `~/.config/explainer/config` (or the file named by `EXPLAINER_CONFIG`) holds per-machine settings as
 shell-style `KEY=VALUE` lines. Environment variables with the same names override the file, the file
 overrides `config.yaml` and `--config`, and `--set` overrides everything. Nothing secret goes here;
-Claude Code keeps its own sign-in.
+Claude Code and Grok Build keep their own sign-in.
 
 ```bash
 # ~/.config/explainer/config
-EXPLAINER_VOICE=kokoro:af_heart        # narrator (voice.use)
+# EXPLAINER_VOICE=elevenlabs:max        # optional default narrator; without it every run needs --voice (voice.use)
 EXPLAINER_LLM_MODEL=opus               # Claude model alias (llm.model)
 # EXPLAINER_CLAUDE_BIN=/path/to/claude # only if `claude` is not on PATH (llm.claude_bin)
 # EXPLAINER_LLM_TIMEOUT=900            # seconds per Claude call (llm.timeout)
 # EXPLAINER_LLM_RETRIES=2              # extra attempts after a bad reply (llm.retries)
-# EXPLAINER_LLM=off                    # force the offline fallback writer (llm.writer)
+# EXPLAINER_WRITER=grok                # claude (default) | grok | off (llm.writer)
+# EXPLAINER_GROK_BIN=/path/to/grok     # only if `grok` is not on PATH or in ~/.grok/bin
 # EXPLAINER_FFMPEG=/path/to/ffmpeg     # an ffmpeg with libass for burned-in captions
+# Bundle path (optional; when you write the scene code yourself):
+# EXPLAINER_DELIVER_DIR=~/Movies/explainers
+# EXPLAINER_BUNDLES_DIR=~/explainer-bundles
+# EXPLAINER_WHISPER_MODEL=/path/to/ggml-base.en.bin
 ```
 
 ## Setup on Linux
@@ -251,6 +391,7 @@ headers for `pycairo`.
 ```bash
 sudo apt install ffmpeg libcairo2-dev pkg-config python3-venv espeak-ng   # espeak-ng is optional
 make setup
+make setup-bundle   # only if you will run `explainer build` here
 ```
 
 Voice models download automatically on first use into `.cache/voices/`. Set `EXPLAINER_VOICE_DIR` to
@@ -260,7 +401,7 @@ put them somewhere else.
 
 | Command | What it does |
 |---|---|
-| `make video TOPIC="how GPS works"` | Full pipeline, 16:9. Cached stages are skipped. |
+| `make video TOPIC="how GPS works"` | Full pipeline from a topic, 16:9. Cached stages are skipped. |
 | `make plan TOPIC="..."` | Only research, script and visual plan (Claude), into `build/<slug>/common/`. |
 | `make plan TOPIC="..." ARGS="--fresh"` | The same, ignoring the topic pack's pinned research/script/plan (Claude writes new ones that cover the topic's brief). |
 | `make vertical TOPIC="..."` | Full pipeline in 9:16 (`configs/vertical.yaml`). |
@@ -274,11 +415,14 @@ put them somewhere else.
 | `make samples` | Build the two bundled samples plus a short 9:16 proof. |
 | `make test` | Unit tests (the Claude CLI is mocked; nothing is sent anywhere). |
 | `make setup-chatterbox`, `make setup-parler` | Optional PyTorch voices, each in its own virtualenv. |
+| `make setup-bundle` | Optional: install skia-python, scipy, soundfile, pyloudnorm for `explainer build`. |
+| `make build BUNDLE=examples/how-natural-gas-gets-to-your-home` | Optional bundle path: TTS, skia render, mix, QA, deliver (when you already wrote the scene code). |
+| `make pack BUNDLE=examples/...` | Tar a bundle (code only) so you can copy it to another machine. |
 
-The CLI can also be called directly:
+The CLI can also be called directly (`.venv/bin/explainer` is a wrapper for `python -m explainer`):
 
 ```bash
-.venv/bin/python -m explainer run "how a heat pump works" --aspect 9:16 --set voice.use=kokoro:bm_george
+.venv/bin/python -m explainer run "how a heat pump works" --aspect 9:16 --voice kokoro:bm_george
 .venv/bin/python -m explainer run "how the electrical grid works" --until plan   # writer stages only
 .venv/bin/python -m explainer run "how lidar works" --source https://en.wikipedia.org/wiki/Lidar
 .venv/bin/python -m explainer run "how lidar works" --until plan --require "tof: timing a laser pulse's round trip"
@@ -287,6 +431,8 @@ The CLI can also be called directly:
 .venv/bin/python -m explainer share out/how-gps-works/16x9/how-gps-works.mp4 --max-mb 15
 .venv/bin/python -m explainer frames "how the electrical grid works" --per-scene 4 --out previews/grid
 .venv/bin/python -m explainer stages                                 # list stages
+.venv/bin/explainer build examples/how-natural-gas-gets-to-your-home # optional: already-written scene code
+.venv/bin/explainer status examples/how-natural-gas-gets-to-your-home --json
 ```
 
 ## Pipeline stages
@@ -307,6 +453,7 @@ for scenes that no longer exist) can therefore never reach a render.
 | c | `plan` | common | `plan.json`, `plan.md` | Claude designs the lesson's visual/animation plan (actors, sentence-synced beats, camera). A topic-pack `plan.json` wins. |
 | – | `shots` | common | `shots.json`, `shots.md` | Template shot list, only for legacy `shots.yaml` packs and the fallback path. When the plan renders the topic it writes an explicit "unused" stub, which the timeline refuses to render. |
 | e | `voice` | common | `voice/<scene>.wav`, `timing.json` | Pluggable TTS, synthesized and cached per sentence for exact caption and animation timing, paced to `voice.target_wpm`. Pauses grow slightly after long sentences. Tracks for scenes no longer in the script are removed. |
+| – | `layout` | common | `plan.fixed.json`, `layout.md`, `layout.meta.json` | Grind writer (`llm.grind`, off by default) fixes the plan's text overlaps without changing its design; a plain copy of the plan when off. See [Splitting the work](#splitting-the-work-per-stage-writers-and-the-grind-writer). |
 | – | `timeline` | variant | `timeline.json` | Resolves the plan's beat times (`s2+0.5`, `e2`) against the narration and sets scene durations: the narration, stretched if needed so every reveal stays up for `reveal_hold` seconds and the on-screen text can be read at `reading_wpm`. Emits sound-design cues and scene transitions. |
 | d | `render` | variant | `scenes/*.mp4`, `poster.png`, `layout_report.json` | Draws the visual plan with Cairo, piped into ffmpeg, rendered in parallel and cached per scene. Includes the layout check (see [Visual plan renderer](#visual-plan-renderer)). |
 | f | `music` | variant | `audio/music.wav`, `audio/sfx.wav` | Procedural score (pads, arpeggio, bass, soft drums, synthetic reverb) plus whooshes, pops and impacts. Pure numpy, so there are no licensing issues. |
@@ -325,8 +472,8 @@ repeatable and deep-merged, then [machine-local settings](#machine-local-setting
   settings such as Kokoro `speed` or Chatterbox `exaggeration`), `target_wpm` and `pace_tolerance`,
   `pronounce`, and engine options (Piper and espeak voices, the Chatterbox/Parler virtualenv paths,
   `torch_device`).
-- **Writer** (`llm.*`): `writer` (`claude` or `off`), `model`, `claude_bin`, `timeout`, `retries`,
-  `web_research`, `extra_args` (appended to every `claude` call). See [Script writer](#script-writer-claude-code).
+- **Writer** (`llm.*`): `writer` (`claude`, `grok` or `off`), `grind`, `stage_writers`, `model`, `claude_bin`, `timeout`, `retries`,
+  `web_research`, `extra_args` (appended to every `claude` call). See [Script writer](#script-writer-claude-code-or-grok-build).
 - **Length and pacing** (`length.*`): `target_seconds` and `words_per_minute` set how much content a
   generated script covers. `max_seconds` is how far the finished video may flex. `scene_lead_in`,
   `sentence_gap`, `sentence_gap_extra` and `scene_tail` control the pauses. `min_scene`, `reveal_hold`
@@ -373,9 +520,10 @@ or `end-1.5`.
 
 ## Plugging in providers
 
-- **Writer**: the Claude Code CLI (see [Script writer](#script-writer-claude-code)). Extra CLI flags can
-  go in `llm.extra_args`.
-- **TTS**: `voice.use: openai` uses an OpenAI-compatible `/audio/speech` endpoint with `OPENAI_API_KEY`
+- **Writer**: the Claude Code CLI or Grok Build (see [Script writer](#script-writer-claude-code-or-grok-build)). Extra CLI flags can
+  go in `llm.extra_args` (Claude) or `llm.grok_extra_args` (Grok).
+- **TTS**: `voice.use: elevenlabs:<voice>` uses the ElevenLabs API (see [ElevenLabs](#elevenlabs)).
+  `voice.use: openai` uses an OpenAI-compatible `/audio/speech` endpoint with `OPENAI_API_KEY`
   from your environment. `voice.use: command` runs any CLI, e.g. macOS `say`. To add an engine, subclass
   `TTSEngine` in `explainer/tts/__init__.py` and register it in `ENGINES`.
 
@@ -404,7 +552,7 @@ committed to git.
   publishing.
 - The layout checker verifies text-to-text overlaps, frame bounds, the caption band and text that never
   appears on screen. Text crossing a graphic is left to the contact sheet (`make frames`) and QA frames.
-- Kokoro reads each sentence on its own, so intonation doesn't carry across sentences the way a human
+- Every voice reads each sentence on its own, so intonation doesn't carry across sentences the way a human
   reading a whole paragraph would. Unusual acronyms may need a spelled-out form (`voice.pronounce`).
 - The bundled voices are English-first. Other languages need a matching Kokoro or Piper voice and
   topic-pack content.

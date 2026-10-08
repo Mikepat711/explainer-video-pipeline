@@ -156,7 +156,7 @@ def plan_events(sc: dict, t0: float, first: bool) -> list[dict]:
 
 class Timeline(Stage):
     name = "timeline"
-    deps = ("plan", "shots", "voice")
+    deps = ("plan", "shots", "voice", "layout")
     description = "sync the visual plan (or legacy shots) to narration timing"
     extra_code = ("gfx/model.py", "plan/vocab.py", "stages/common.py")
 

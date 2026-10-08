@@ -9,7 +9,7 @@ from ..plan.prompts import script_prompt
 from ..plan.schemas import SCRIPT
 from ..scriptfmt import parse_script
 from ..util import log, read_json, write_json
-from ..writer import banner, fallback_is_stale, get_writer, require_claude, write_meta, writer_identity
+from ..writer import banner, fallback_is_stale, get_writer, require_claude, write_meta, writer_identity, writer_name
 from .common import optional_file
 
 
@@ -32,7 +32,7 @@ class Script(Stage):
     def inputs(self, ctx):
         L = ctx.cfg["length"]
         return {"topic": ctx.topic, "length": {k: L[k] for k in ("target_seconds", "words_per_minute")},
-                "writer": writer_identity(ctx.cfg), "override": optional_file(ctx.pack_file("script.md")),
+                "writer": writer_identity(ctx.cfg, self.name), "override": optional_file(ctx.pack_file("script.md")),
                 "brief": ctx.brief.inputs()}
 
     def outputs(self, ctx):
@@ -66,7 +66,7 @@ class Script(Stage):
             write_meta(c, self.name, "topic-pack")
             return
         research = read_json(c / "research.json")
-        writer, reason = get_writer(ctx.cfg)
+        writer, reason = get_writer(ctx.cfg, self.name)
         if writer:
             try:
                 brief = {k: v for k, v in research.items() if k != "mode"}
@@ -83,7 +83,7 @@ class Script(Stage):
             except ClaudeError as exc:
                 reason = str(exc)
         require_claude(ctx, self.name, reason)
-        banner(self.name, reason)
+        banner(self.name, reason, writer_name(ctx.cfg, self.name))
         sections = research.get("sections") or []
         script = {"mode": "offline", **offline.teaching_script(ctx.topic, sections, target)}
         (c / "script.md").write_text(script_markdown(script))

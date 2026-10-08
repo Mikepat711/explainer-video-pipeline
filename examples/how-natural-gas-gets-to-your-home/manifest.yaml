@@ -1,0 +1,23 @@
+# explainer-bundle/v1 — see docs/bundle.md
+schema: explainer-bundle/v1
+title: How Natural Gas Gets to Your Home
+slug: how-natural-gas-gets-to-your-home
+voice: kokoro:af_heart
+output: how-natural-gas-gets-to-your-home.mp4
+aspect: "16:9"
+fps: 30
+width: 1920
+height: 1080
+script: script.py
+scenes: scenes.py
+modules:
+  - art_gas.py
+timing:
+  lead: 0.7
+  tail: 1.0
+  gap: 0.55
+  comma_gap: 0.22
+  speed: 0.97
+  tails:
+    hook: 1.4
+    close: 4.5

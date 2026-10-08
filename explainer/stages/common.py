@@ -27,7 +27,8 @@ def plan_engine(ctx) -> dict | None:
     if engine == "templates":
         return None
     path = ctx.common / "plan.json"
-    plan = read_json(path) if path.exists() else {}
+    fixed = ctx.common / "plan.fixed.json"  # the layout stage's output (a copy of plan.json unless it fixed things)
+    plan = read_json(fixed if fixed.exists() else path) if path.exists() else {}
     if plan.get("legacy_shots") or not plan.get("scenes"):
         if engine == "plan":
             raise SystemExit("render.engine=plan but there is no visual plan for this topic; run the plan stage")

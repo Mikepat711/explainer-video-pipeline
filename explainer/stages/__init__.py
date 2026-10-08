@@ -1,5 +1,6 @@
 from .assemble import Assemble
 from .captions import Captions
+from .layout import Layout
 from .mix import Mix
 from .music import Music
 from .plan import Plan
@@ -11,6 +12,6 @@ from .shots import Shots
 from .timeline import Timeline
 from .voice import Voice
 
-ORDER = [Research(), Script(), Plan(), Shots(), Voice(), Timeline(), Render(), Music(), Mix(), Captions(),
+ORDER = [Research(), Script(), Plan(), Shots(), Voice(), Layout(), Timeline(), Render(), Music(), Mix(), Captions(),
          Assemble(), QA()]
 REGISTRY = {s.name: s for s in ORDER}

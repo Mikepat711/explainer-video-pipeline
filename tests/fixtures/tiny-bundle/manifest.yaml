@@ -1,0 +1,13 @@
+schema: explainer-bundle/v1
+title: Tiny Test Bundle
+slug: tiny-test-bundle
+voice: silence
+output: tiny-test-bundle.mp4
+aspect: "16:9"
+script: script.py
+scenes: scenes.py
+timing:
+  lead: 0.2
+  tail: 0.3
+  gap: 0.2
+  comma_gap: 0.1

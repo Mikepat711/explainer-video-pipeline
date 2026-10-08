@@ -11,15 +11,23 @@ VIDEO   ?=
 MAX_MB  ?= 15
 PER_SCENE ?= 4
 
-.PHONY: setup setup-chatterbox setup-parler plan video vertical short stage status preview frames clean samples test voices share
+BUNDLE  ?= examples/how-natural-gas-gets-to-your-home
+
+.PHONY: setup setup-bundle setup-chatterbox setup-parler plan video vertical short stage status preview frames clean samples test voices share build pack
 
 setup:            ## create venv and install deps (voice models download on first use)
 	$(PYTHON) -m venv .venv
 	$(PY) -m pip install -q --upgrade pip
 	$(PY) -m pip install -q -r requirements.txt
+	@printf '%s\n' '#!/bin/sh' 'exec "$(CURDIR)/.venv/bin/python" -m explainer "$$@"' > .venv/bin/explainer
+	@chmod +x .venv/bin/explainer
 	@command -v ffmpeg >/dev/null || echo "!! ffmpeg not found: install it (apt install ffmpeg / brew install ffmpeg)"
 	@command -v espeak-ng >/dev/null || echo "note: espeak-ng not found (optional last-resort TTS)"
-	@command -v claude >/dev/null || test -x "$$HOME/.local/bin/claude" || echo "note: Claude Code CLI not found; research/script/plan will use the weak fallback writer (see README)"
+	@command -v claude >/dev/null || test -x "$$HOME/.local/bin/claude" || echo "note: Claude Code CLI not found; the writer path will use the weak fallback (see README)"
+
+setup-bundle:     ## skia / mix extras for `explainer build` (optional bundle path)
+	$(PY) -m pip install -q -r requirements-bundle.txt
+	@echo "bundle extras installed. Try: $(PY) -m explainer build $(BUNDLE)"
 
 setup-chatterbox: ## optional Chatterbox voice in its own venv (pinned torch; setuptools<81 keeps its watermarker working)
 	$(PYTHON) -m venv .venv-chatterbox
@@ -40,7 +48,13 @@ voices:           ## compare voices on one paragraph: make voices VOICES=kokoro:
 share:            ## size-capped copy for chat/email: make share VIDEO=out/.../how-gps-works.mp4 MAX_MB=15
 	$(PY) -m explainer share "$(VIDEO)" --max-mb $(MAX_MB) $(ARGS)
 
-video:            ## full pipeline: make video TOPIC="how GPS works"
+build:            ## produce a project bundle: make build BUNDLE=examples/how-natural-gas-gets-to-your-home
+	$(PY) -m explainer build "$(BUNDLE)" $(CFGARG) $(ARGS)
+
+pack:             ## tar a bundle for transfer: make pack BUNDLE=examples/how-natural-gas-gets-to-your-home
+	$(PY) -m explainer pack "$(BUNDLE)" $(ARGS)
+
+video:            ## full pipeline from a topic: make video TOPIC="how GPS works"
 	$(PY) -m explainer run "$(TOPIC)" $(CFGARG) $(ARGS)
 
 vertical:         ## 9:16 render of the whole video
